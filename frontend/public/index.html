@@ -1,0 +1,38 @@
+<!-- 
+  MÓDULO INDEX.HTML - PUNTO DE ENTRADA HTML
+  ==========================================
+  
+  Este es el archivo HTML principal que el navegador carga primero.
+  Sus funciones son:
+  
+  1. ESTRUCTURA BASE: Define la estructura HTML básica con meta tags y scripts.
+  
+  2. ELEMENTO ROOT: Contiene el div con id="root" donde React renderizará toda la aplicación.
+     - React busca este elemento y lo llena completamente con componentes.
+  
+  3. META TAGS: Incluye información sobre la app para el navegador y SEO.
+     - charset: codificación de caracteres (UTF-8)
+     - viewport: responsive en móviles
+     - theme-color: color de la barra de navegación
+  
+  El navegador carga este HTML → luego carga index.jsx → que renderiza App.jsx y sus componentes.
+-->
+
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta
+      name="description"
+      content="Mi Proyecto - Frontend React"
+    />
+    <title>Mi Proyecto</title>
+  </head>
+  <body>
+    <noscript>Necesitas habilitar JavaScript para ejecutar esta aplicación.</noscript>
+    <!-- Este es el contenedor donde React renderiza toda la aplicación -->
+    <div id="root"></div>
+  </body>
+</html>
