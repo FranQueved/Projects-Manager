@@ -59,6 +59,12 @@ class EmployeeService:
         """Obtiene un empleado con su perfil cargado."""
         return self.db.query(Employee).filter(Employee.id == employee_id).first()
 
+    def get_profile_of_employee(self, employee_id: int) -> Optional[Profile]:
+        """Obtiene el perfil asociado a un empleado."""
+        employee = self.get_by_id(employee_id)
+        if employee:
+            return employee.profile
+        return None
     # UPDATE
     def update_by_id(self, employee_id: int, json_data: dict) -> Optional[Employee]:
         """Actualiza un empleado por ID."""

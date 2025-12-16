@@ -3,7 +3,7 @@
 from typing import List, Optional
 from sqlalchemy.orm import Session
 from app.db.database import SessionLocal
-from app.schemas.project import ProjectCreate, ProjectRead
+from app.schemas.project import ProjectCreate, ProjectRead , ProjectUpdate
 from app.models.project import Project
 
 class ProjectService:

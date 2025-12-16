@@ -6,11 +6,11 @@ Este archivo muestra cómo usar todos los servicios CRUD
 con datos de prueba masivos (100 empleados, 30 proyectos, 150 asignaciones)
 """
 
-from app.services.project_service import ProjectService
-from app.services.employee_service import EmployeeService
-from app.services.profile_service import ProfileService
-from app.services.employee_project_service import EmployeeProjectService
-from app.services.test_data import (
+from app.services.service_layer.project_service import ProjectService
+from app.services.service_layer.employee_service import EmployeeService
+from app.services.service_layer.profile_service import ProfileService
+from app.services.service_layer.employee_project_service import EmployeeProjectService
+from app.services.examples.test_data import (
     PROFILES_DATA, EMPLOYEES_DATA, PROJECTS_DATA, ASSIGNMENTS_DATA
 )
 from app.db.create_tables import InitDB

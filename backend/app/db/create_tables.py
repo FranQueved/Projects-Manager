@@ -3,6 +3,7 @@ from app.models.epmloyees import Employee
 from app.models.profile import  Profile
 from app.models.project import Project
 from app.models.employee_project import employee_project
+from app.models.embeding_table import embeding_table
 from sqlalchemy import inspect
 
 

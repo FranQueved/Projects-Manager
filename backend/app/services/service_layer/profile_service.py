@@ -54,6 +54,12 @@ class ProfileService:
         """Obtiene perfiles que contienen un idioma específico."""
         return self.db.query(Profile).filter(Profile.languages.ilike(f"%{language}%")).all()
 
+    def toString(self, profile_id: int) -> Optional[str]:
+        """Retorna una representación en string de un perfil."""
+        profile = self.get_by_id(profile_id)
+        if profile:
+            return f"softSkills={profile.softSkills}, hardSkills={profile.hardSkills}, languages={profile.languages})"
+        return None
     # UPDATE
     def update_by_id(self, profile_id: int, json_data: dict) -> Optional[Profile]:
         """Actualiza un perfil por ID."""

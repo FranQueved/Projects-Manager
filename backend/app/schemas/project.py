@@ -24,3 +24,8 @@ class ProjectRead(ProjectBase):
 
     class Config:
         orm_mode = True
+
+
+# Schema para actualizar un proyecto (lo que envía el frontend para actualizaciones)
+class ProjectUpdate(ProjectBase):
+    pass

@@ -25,3 +25,12 @@ sqlalchemy==2.0.44
 
 # Driver para conectar a PostgreSQL
 psycopg2-binary==2.9.11
+
+# Embeddings basados en Sentence Transformers
+sentence-transformers==5.2.0
+
+# Framework de Machine Learning (requerido por sentence-transformers)
+torch==2.9.1
+
+# Tokenizador para modelos de NLP
+transformers==4.57.3
