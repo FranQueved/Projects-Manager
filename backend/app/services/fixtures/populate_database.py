@@ -21,6 +21,7 @@ if __name__ == "__main__":
     print("  ✅ Generación de 100 empleados con perfiles")
     print("  ✅ Generación de 30 proyectos")
     print("  ✅ Asignaciones aleatorias empleado-proyecto")
+    print("  ✅ Perfiles requeridos por proyecto (1-4 por proyecto)")
     print("  ✅ Embeddings vectoriales de perfiles")
     print("\n" + "=" * 70 + "\n")
 

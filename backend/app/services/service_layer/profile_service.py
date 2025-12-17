@@ -94,6 +94,17 @@ class ProfileService:
         self.db.refresh(profile)
         return profile
 
+    def update_profile_embedding(self, profile_id: int, embedding: List[float]) -> Optional[Profile]:
+        """Actualiza el embedding de un perfil."""
+        profile = self.get_by_id(profile_id)
+        if not profile:
+            return None
+
+        profile.embedding = embedding
+        self.db.commit()
+        self.db.refresh(profile)
+        return profile
+
     # DELETE
     def delete_by_id(self, profile_id: int) -> bool:
         """Elimina un perfil por ID."""

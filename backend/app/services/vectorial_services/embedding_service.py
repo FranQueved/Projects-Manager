@@ -24,6 +24,24 @@ class EmbeddingService:
         self.profile_service = ProfileService()
         self.employee_service = EmployeeService()
 
+    def generate_embedding(self, text: str) -> Optional[List[float]]:
+        """
+        Genera un embedding a partir de un texto.
+        
+        Args:
+            text: Texto a convertir en embedding
+            
+        Returns:
+            List[float] o None: El embedding como lista de floats
+        """
+        try:
+            embedding = string_a_embedding(text)
+            # Convertir a lista para retornar
+            return embedding.tolist()
+        except Exception as e:
+            print(f"   Error generando embedding para texto: {e}")
+            return None
+
     def create_embedding_for_employee(self, employee_id: int) -> bool:
         """
         Genera un embedding para un empleado basado en su perfil profesional.

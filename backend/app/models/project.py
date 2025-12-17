@@ -19,3 +19,10 @@ class Project(Base):
         secondary="employee_project",
         back_populates="projects"
     )
+    
+    # Relación con perfiles requeridos (1:N)
+    required_profiles = relationship(
+        "RequiredProfile",
+        back_populates="project",
+        cascade="all, delete-orphan"
+    )
