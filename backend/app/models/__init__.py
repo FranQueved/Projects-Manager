@@ -33,3 +33,13 @@
 # 
 # Aquí importas y exportas todos los modelos para usarlos en otros módulos
 # 
+
+
+from app.models.project import Project
+from app.models.epmloyees import Employee
+from app.models.profile import Profile
+__all__ = [
+    "Project",
+    "Employee",
+    "Profile",
+]

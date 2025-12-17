@@ -110,6 +110,16 @@ pytest tests/
 - Operaciones en BD
 - Reglas de aplicación
 
+**Servicios disponibles:**
+- `create_proyect.py` - ProjectCreator: Crear proyectos individuales o múltiples
+- `create_employee.py` - EmployeeCreator: Crear empleados individuales o múltiples
+- `create_profile.py` - ProfileCreator: Crear perfiles individuales o múltiples
+- `project_service.py` - ProjectService: CRUD completo de proyectos
+- `employee_service.py` - EmployeeService: CRUD completo de empleados
+- `profile_service.py` - ProfileService: CRUD completo de perfiles
+- `employee_project_service.py` - EmployeeProjectService: Gestionar asignaciones empleado-proyecto
+- `ejemplo_uso_servicios.py` - Ejemplos de uso de todos los servicios
+
 ### models/
 - Modelos Pydantic para validación
 - Modelos SQLAlchemy para BD
@@ -118,6 +128,98 @@ pytest tests/
 - Configuración de conexión
 - Sesiones de BD
 - Migraciones (si usa Alembic)
+
+## 🔧 Servicios CRUD
+
+### Patrón de Diseño
+Todos los servicios siguen el mismo patrón que `create_proyect.py`:
+
+1. **Constructor**: Abre sesión de base de datos
+2. **create_one()**: Crea un registro individual
+3. **create_many()**: Crea múltiples registros
+4. **Métodos CRUD**: get_by_id, get_all, update_by_id, delete_by_id
+5. **close()**: Cierra sesión de BD
+
+### Ejemplo de Uso
+
+```python
+from app.services.project_service import ProjectService
+from datetime import date
+
+# Crear servicio
+service = ProjectService()
+
+# Crear un proyecto
+project_data = {
+    "name": "Nuevo Proyecto",
+    "description": "Descripción del proyecto",
+    "client": "Cliente ABC",
+    "start_date": date.today(),
+    "budget": 30000
+}
+project = service.create_one(project_data)
+
+# Obtener proyecto
+project = service.get_by_id(1)
+
+# Actualizar proyecto
+update_data = {"budget": 35000}
+service.update_by_id(1, update_data)
+
+# Eliminar proyecto
+service.delete_by_id(1)
+
+# Cerrar conexión
+service.close()
+```
+
+### Servicios Disponibles
+
+#### ProjectService
+```python
+from app.services.project_service import ProjectService
+
+service = ProjectService()
+# create_one(), create_many(), get_by_id(), get_all()
+# get_by_client(), get_finished(), get_active()
+# update_by_id(), delete_by_id(), delete_many()
+```
+
+#### EmployeeService
+```python
+from app.services.employee_service import EmployeeService
+
+service = EmployeeService()
+# create_one(), create_many(), get_by_id(), get_all()
+# get_by_office(), get_by_name(), get_with_profile()
+# update_by_id(), delete_by_id(), delete_many()
+```
+
+#### ProfileService
+```python
+from app.services.profile_service import ProfileService
+
+service = ProfileService()
+# create_one(), create_many(), get_by_id(), get_all()
+# get_by_skill(), get_by_language()
+# update_by_id(), delete_by_id(), delete_many()
+```
+
+#### EmployeeProjectService
+```python
+from app.services.employee_project_service import EmployeeProjectService
+
+service = EmployeeProjectService()
+# assign_employee_to_project(), remove_employee_from_project()
+# get_employees_by_project(), get_projects_by_employee()
+# assign_multiple_employees_to_project()
+```
+
+### Ejecutar Ejemplos
+```bash
+# Desde backend/
+python app/services/ejemplo_uso_servicios.py
+```
 
 ## 📚 Crear un nuevo router
 
