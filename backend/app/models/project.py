@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean, Date
+from sqlalchemy import Column, Integer, String, Boolean, Date , ForeignKeyConstraint
 from sqlalchemy.orm import relationship
 from app.db.database import Base
 
@@ -14,7 +14,6 @@ class Project(Base):
     finished = Column(Boolean, default=False)
     budget = Column(Integer, nullable=False)
     presential = Column(Boolean, default=False)
-
     employees = relationship(
         "Employee",
         secondary="employee_project",

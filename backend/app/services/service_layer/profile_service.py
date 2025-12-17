@@ -55,10 +55,27 @@ class ProfileService:
         return self.db.query(Profile).filter(Profile.languages.ilike(f"%{language}%")).all()
 
     def toString(self, profile_id: int) -> Optional[str]:
-        """Retorna una representación en string de un perfil."""
+        """
+        Retorna una representación en string de un perfil.
+        Formato: solo los skills separados por espacios (compatible con embedding).
+        """
         profile = self.get_by_id(profile_id)
         if profile:
-            return f"softSkills={profile.softSkills}, hardSkills={profile.hardSkills}, languages={profile.languages})"
+            # Combinar hardSkills, softSkills e idiomas
+            # Reemplazar comas y guiones con espacios para que el tokenizador los separe bien
+            parts = []
+            if profile.hardSkills:
+                parts.append(profile.hardSkills.replace(",", " ").replace("-", " "))
+            if profile.softSkills:
+                parts.append(profile.softSkills.replace(",", " ").replace("-", " "))
+            if profile.languages:
+                parts.append(profile.languages.replace(",", " ").replace("-", " "))
+            
+            # Unir todo con espacios y limpiar espacios múltiples
+            result = " ".join(parts)
+            # Eliminar espacios múltiples
+            result = " ".join(result.split())
+            return result
         return None
     # UPDATE
     def update_by_id(self, profile_id: int, json_data: dict) -> Optional[Profile]:

@@ -1,6 +1,5 @@
 """
-DATOS DE PRUEBA PARA EL EJEMPLO DE SERVICIOS
-=============================================
+Datos de prueba (fixtures) para la base de datos
 
 Este archivo contiene datos JSON de prueba para:
 - 100 empleados con sus perfiles (relación 1 a 1)

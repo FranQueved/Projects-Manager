@@ -26,6 +26,16 @@ sqlalchemy==2.0.44
 # Driver para conectar a PostgreSQL
 psycopg2-binary==2.9.11
 
+# Generación de embeddings con Word2Vec (sin torch)
+gensim==4.4.0
+python-dotenv==1.2.1
+
+# ORM para bases de datos SQL
+sqlalchemy==2.0.44
+
+# Driver para conectar a PostgreSQL
+psycopg2-binary==2.9.11
+
 # Embeddings basados en Sentence Transformers
 sentence-transformers==5.2.0
 
