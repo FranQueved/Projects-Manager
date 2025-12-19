@@ -5,8 +5,8 @@ from typing import Optional
 
 # Base: campos comunes entre entrada y salida
 class ProfileBase(BaseModel):
-    hardSkills: str
-    softSkills: str
+    hard_skills: str
+    soft_skills: str
     languages: str
 
 # Schema para crear un perfil (lo que envía el frontend)
@@ -22,6 +22,6 @@ class ProfileRead(ProfileBase):
 
 # Schema para actualizar un perfil
 class ProfileUpdate(BaseModel):
-    hardSkills: Optional[str] = None
-    softSkills: Optional[str] = None
+    hard_skills: Optional[str] = None
+    soft_skills: Optional[str] = None
     languages: Optional[str] = None

@@ -3,7 +3,7 @@
 from typing import List, Optional
 from sqlalchemy.orm import Session
 from app.db.database import SessionLocal
-from app.models.epmloyees import Employee
+from app.models.employee import Employee
 from app.models.project import Project
 from app.models.employee_project import employee_project
 

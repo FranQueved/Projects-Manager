@@ -1,7 +1,7 @@
 # app/services/create_employee.py
 
 from app.schemas.employee import EmployeeCreate
-from app.models.epmloyees import Employee
+from app.models.employee import Employee
 from app.db.database import SessionLocal
 
 class EmployeeCreator:

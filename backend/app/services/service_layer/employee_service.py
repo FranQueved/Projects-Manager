@@ -4,7 +4,7 @@ from typing import List, Optional
 from sqlalchemy.orm import Session
 from app.db.database import SessionLocal
 from app.schemas.employee import EmployeeCreate, EmployeeUpdate, EmployeeRead
-from app.models.epmloyees import Employee
+from app.models.employee import Employee
 from app.models.profile import Profile
 
 class EmployeeService:

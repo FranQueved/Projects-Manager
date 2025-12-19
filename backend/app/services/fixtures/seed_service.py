@@ -65,38 +65,38 @@ class SeedService:
             # 1. Crear perfiles
             print(f"\n[1/4] Creando {len(PROFILES_DATA)} perfiles...")
             stats["profiles"] = self._create_profiles()
-            print(f"   ✅ {stats['profiles']} perfiles creados exitosamente")
+            print(f"   [OK] {stats['profiles']} perfiles creados exitosamente")
 
             # 2. Crear empleados
             print(f"\n[2/4] Creando {len(EMPLOYEES_DATA)} empleados...")
             stats["employees"] = self._create_employees()
-            print(f"   ✅ {stats['employees']} empleados creados exitosamente")
+            print(f"   [OK] {stats['employees']} empleados creados exitosamente")
 
             # 3. Crear proyectos
             print(f"\n[3/4] Creando {len(PROJECTS_DATA)} proyectos...")
             stats["projects"] = self._create_projects()
-            print(f"   ✅ {stats['projects']} proyectos creados exitosamente")
+            print(f"   [OK] {stats['projects']} proyectos creados exitosamente")
 
             # 4. Crear asignaciones
             print(f"\n[4/4] Creando {len(ASSIGNMENTS_DATA)} asignaciones...")
             stats["assignments"] = self._create_assignments()
-            print(f"   ✅ {stats['assignments']} asignaciones creadas exitosamente")
+            print(f"   [OK] {stats['assignments']} asignaciones creadas exitosamente")
 
             # 5. Crear perfiles requeridos para proyectos
-            print(f"\n[5/6] Asignando perfiles requeridos a proyectos...")
+            print(f"\n[5/7] Asignando perfiles requeridos a proyectos...")
             stats["required_profiles"] = self._create_required_profiles()
-            print(f"   ✅ Perfiles requeridos asignados exitosamente")
+            print(f"   [OK] Perfiles requeridos asignados exitosamente")
 
-            # 6. Generar embeddings de perfiles (nuevo)
-            print(f"\n[6/7] Generando embeddings de perfiles...")
-            stats["profile_embeddings"] = self._create_profile_embeddings()
-            print(f"   ✅ {stats['profile_embeddings']} embeddings de perfiles creados exitosamente")
+            # 6. Generar embeddings de required_profiles
+            print(f"\n[6/7] Generando embeddings de perfiles requeridos...")
+            stats["required_profile_embeddings"] = self._create_required_profile_embeddings()
+            print(f"   [OK] {stats['required_profile_embeddings']} embeddings de required_profiles creados exitosamente")
 
-            # 7. Generar embeddings de empleados (original)
+            # 7. Generar embeddings de empleados
             if include_embeddings:
                 print(f"\n[7/7] Generando embeddings de empleados...")
                 stats["embeddings"] = self._create_embeddings()
-                print(f"   ✅ {stats['embeddings']} embeddings de empleados creados exitosamente")
+                print(f"   [OK] {stats['embeddings']} embeddings de empleados creados exitosamente")
 
             # Estadísticas finales
             elapsed_time = time.time() - start_time
@@ -105,20 +105,20 @@ class SeedService:
                 stats["employees"] + 
                 stats["projects"] + 
                 stats["assignments"] +
-                stats["embeddings"]
+                stats.get("embeddings", 0)
             )
 
             print(f"\n" + "=" * 70)
             print(f"SEEDING COMPLETADO EXITOSAMENTE")
             print(f"=" * 70)
-            print(f"⏱️  Tiempo total: {elapsed_time:.2f} segundos")
-            print(f"📊 Estadísticas:")
+            print(f"[TIME] Tiempo total: {elapsed_time:.2f} segundos")
+            print(f"[STATS] Estadísticas:")
             print(f"   • Perfiles: {stats['profiles']}")
             print(f"   • Empleados: {stats['employees']}")
             print(f"   • Proyectos: {stats['projects']}")
             print(f"   • Asignaciones: {stats['assignments']}")
             print(f"   • Perfiles requeridos: {stats.get('required_profiles', 0)}")
-            print(f"   • Embeddings de perfiles: {stats.get('profile_embeddings', 0)}")
+            print(f"   • Embeddings de required_profiles: {stats.get('required_profile_embeddings', 0)}")
             if include_embeddings:
                 print(f"   • Embeddings de empleados: {stats['embeddings']}")
             print("=" * 70 + "\n")
@@ -127,7 +127,7 @@ class SeedService:
             return stats
 
         except Exception as e:
-            print(f"\n❌ Error durante seeding: {e}")
+            print(f"\n[ERROR] Error durante seeding: {e}")
             import traceback
             traceback.print_exc()
             return stats
@@ -204,30 +204,45 @@ class SeedService:
         """Genera embeddings para todos los perfiles y los almacena en BD."""
         created_count = 0
         try:
+            from sqlalchemy import text
+            from app.db.database import SessionLocal
+            
             all_profiles = self.profile_service.get_all()
             
             if not all_profiles:
                 print("   ⚠️  No hay perfiles disponibles")
                 return 0
             
+            db = SessionLocal()
+            
             for i, profile in enumerate(all_profiles, 1):
                 try:
                     # Crear texto a partir de skills y lenguajes
-                    profile_text = f"{profile.hardSkills} {profile.softSkills} {profile.languages}"
+                    profile_text = f"{profile.hard_skills} {profile.soft_skills} {profile.languages}"
                     
                     # Generar embedding usando embedding_service
                     embedding_vector = self.embedding_service.generate_embedding(profile_text)
                     
-                    # Actualizar perfil con embedding
+                    # Guardar embedding en tabla embeddings
                     if embedding_vector:
-                        self.profile_service.update_profile_embedding(profile.id, embedding_vector)
+                        vector_str = "[" + ",".join(str(x) for x in embedding_vector) + "]"
+                        
+                        sql_insert = text("""
+                            INSERT INTO embeddings (id, vector)
+                            VALUES (DEFAULT, :vector_str::vector)
+                        """)
+                        
+                        db.execute(sql_insert, {"vector_str": vector_str})
+                        db.commit()
                         created_count += 1
                     
                     if i % 10 == 0:
                         print(f"   Embeddings generados {i}/{len(all_profiles)}")
                 except Exception as e:
                     print(f"   ⚠️  Error generando embedding para perfil {profile.id}: {e}")
+                    db.rollback()
             
+            db.close()
             return created_count
         except Exception as e:
             print(f"   ⚠️  Error en proceso de embeddings de perfiles: {e}")
@@ -246,21 +261,25 @@ class SeedService:
         created_count = 0
         try:
             all_projects = self.project_service.get_all()
-            all_profiles = self.profile_service.get_all()
             
-            if not all_profiles:
-                print("   ⚠️  No hay perfiles disponibles")
+            # Usamos PROFILES_DATA para generar requerimientos realistas
+            if not PROFILES_DATA:
+                print("   ⚠️  No hay datos de perfiles disponibles")
                 return 0
             
             for project in all_projects:
                 # Generar entre 1 y 4 perfiles requeridos aleatoriamente
-                num_required = random.randint(1, min(4, len(all_profiles)))
-                selected_profiles = random.sample(all_profiles, num_required)
+                num_required = random.randint(1, 4)
                 
-                for profile in selected_profiles:
+                for _ in range(num_required):
+                    # Seleccionar un perfil aleatorio como base para los requerimientos
+                    profile_data = random.choice(PROFILES_DATA)
+                    
                     success = self.required_profile_service.add_required_profile(
                         project_id=project.id,
-                        profile_id=profile.id
+                        hard_skills=profile_data["hard_skills"],
+                        soft_skills=profile_data["soft_skills"],
+                        languages=profile_data["languages"]
                     )
                     if success:
                         created_count += 1
@@ -270,6 +289,64 @@ class SeedService:
             
         except Exception as e:
             print(f"   ⚠️  Error creando perfiles requeridos: {e}")
+            return 0
+
+    def _create_required_profile_embeddings(self):
+        """Genera embeddings para todos los perfiles requeridos."""
+        try:
+            from app.services.service_layer.required_profile_service import RequiredProfileService
+            
+            rp_service = RequiredProfileService()
+            all_required = rp_service.get_all()
+            success_count = 0
+            
+            if not all_required:
+                print("   ⚠️  No hay perfiles requeridos disponibles")
+                return 0
+            
+            for i, required_profile in enumerate(all_required, 1):
+                try:
+                    # Generar embedding para el perfil requerido usando sus propios campos
+                    profile_text = f"{required_profile.hard_skills} {required_profile.soft_skills} {required_profile.languages}"
+                    embedding_vector = self.embedding_service.generate_embedding(profile_text)
+                    
+                    if embedding_vector:
+                        # Guardar embedding en tabla embeddings
+                        from sqlalchemy import text
+                        from app.db.database import SessionLocal
+                        
+                        db = SessionLocal()
+                        vector_str = "[" + ",".join(str(x) for x in embedding_vector) + "]"
+
+                        sql_delete = text("""
+                            DELETE FROM embeddings 
+                            WHERE required_profile_id = :required_profile_id
+                        """)
+
+                        sql_insert = text("""
+                            INSERT INTO embeddings (required_profile_id, vector, created_at)
+                            VALUES (:required_profile_id, CAST(:vector_str AS vector), NOW())
+                        """)
+
+                        db.execute(sql_delete, {"required_profile_id": required_profile.id})
+                        db.execute(sql_insert, {
+                            "required_profile_id": required_profile.id, 
+                            "vector_str": vector_str
+                        })
+                        db.commit()
+                        db.close()
+                        success_count += 1
+                    
+                    if i % 10 == 0:
+                        print(f"   Embeddings generados {i}/{len(all_required)}")
+                        
+                except Exception as e:
+                    print(f"   ⚠️  Error generando embedding para required_profile {required_profile.id}: {e}")
+            
+            return success_count
+            
+        except Exception as e:
+            print(f"   ⚠️  Error en proceso de embeddings de required_profiles: {e}")
             return 0
 
     def validate_data(self):
@@ -295,17 +372,17 @@ class SeedService:
             # Validar empleados
             all_employees = self.employee_service.get_all()
             validation_results["employees"] = len(all_employees)
-            print(f"✅ Empleados en BD: {len(all_employees)}/100")
+            print(f"[OK] Empleados en BD: {len(all_employees)}/100")
 
             # Validar perfiles
             all_profiles = self.profile_service.get_all()
             validation_results["profiles"] = len(all_profiles)
-            print(f"✅ Perfiles en BD: {len(all_profiles)}/100")
+            print(f"[OK] Perfiles en BD: {len(all_profiles)}/100")
 
             # Validar proyectos
             all_projects = self.project_service.get_all()
             validation_results["projects"] = len(all_projects)
-            print(f"✅ Proyectos en BD: {len(all_projects)}/30")
+            print(f"[OK] Proyectos en BD: {len(all_projects)}/30")
 
             # Validar asignaciones
             total_assignments = 0
@@ -313,7 +390,7 @@ class SeedService:
                 employees_in_project = self.assignment_service.get_employees_by_project(project.id)
                 total_assignments += len(employees_in_project)
             validation_results["assignments"] = total_assignments
-            print(f"✅ Asignaciones en BD: {total_assignments}/150+")
+            print(f"[OK] Asignaciones en BD: {total_assignments}/150+")
 
             # Validar relación empleado-perfil
             employees_with_profiles = 0
@@ -321,23 +398,23 @@ class SeedService:
                 emp_with_profile = self.employee_service.get_with_profile(employee.id)
                 if emp_with_profile.profile:
                     employees_with_profiles += 1
-            print(f"✅ Relaciones empleado-perfil: {employees_with_profiles}/10 validados")
+            print(f"[OK] Relaciones empleado-perfil: {employees_with_profiles}/10 validados")
 
             # Mostrar ejemplos
-            print(f"\n📋 EJEMPLOS DE DATOS:")
+            print(f"\n[DATA] EJEMPLOS DE DATOS:")
             if all_employees:
                 emp = all_employees[0]
                 emp_with_profile = self.employee_service.get_with_profile(emp.id)
-                print(f"   👤 Empleado: {emp_with_profile.name} ({emp_with_profile.office})")
+                print(f"   [USER] Empleado: {emp_with_profile.name} ({emp_with_profile.office})")
                 if emp_with_profile.profile:
-                    skills = emp_with_profile.profile.hardSkills[:50]
-                    print(f"   📋 Skills: {skills}...")
+                    skills = emp_with_profile.profile.hard_skills[:50]
+                    print(f"   [SKILL] Skills: {skills}...")
 
             if all_projects:
                 proj = all_projects[0]
                 employees_in_proj = self.assignment_service.get_employees_by_project(proj.id)
-                print(f"   📁 Proyecto: {proj.name}")
-                print(f"   👥 Empleados asignados: {len(employees_in_proj)}")
+                print(f"   [PROJ] Proyecto: {proj.name}")
+                print(f"   [TEAM] Empleados asignados: {len(employees_in_proj)}")
 
             print("=" * 70 + "\n")
             return validation_results

@@ -2,7 +2,7 @@
 
 Proyecto fullstack con React en el frontend y FastAPI en el backend.
 
-## 📁 Estructura del Proyecto
+## Estructura del Proyecto
 
 ```
 mi-proyecto/
@@ -31,7 +31,7 @@ mi-proyecto/
     └── README.md
 ```
 
-## 🚀 Inicio Rápido
+## Inicio Rápido
 
 ### Frontend (React)
 
@@ -93,7 +93,7 @@ Documentación: http://localhost:8000/docs
 - **SQLAlchemy**: ORM
 - **PostgreSQL**: Base de datos (opcional)
 
-## 📚 Documentación Detallada
+## Documentación Detallada
 
 - **[Frontend README](./frontend/README.md)** - Guía completa del frontend
 - **[Backend README](./backend/README.md)** - Guía completa del backend
@@ -132,14 +132,14 @@ SECRET_KEY=tu_clave_secreta
 DEBUG=True
 ```
 
-## 📋 Checklist de Desarrollo
+## Checklist de Desarrollo
 
 - [ ] Clonar proyecto
 - [ ] Instalar dependencias frontend
 - [ ] Instalar dependencias backend
 - [ ] Configurar archivos .env
 - [ ] Verificar que ambos servidores inician correctamente
-- [ ] Comprobar conectividad frontend ↔ backend
+- [ ] Comprobar conectividad frontend y backend
 - [ ] Crear modelos y endpoints iniciales
 - [ ] Crear componentes React principales
 
@@ -158,7 +158,7 @@ pip install gunicorn
 gunicorn -w 4 -k uvicorn.workers.UvicornWorker app.main:app
 ```
 
-## 👥 Estructura de Carpetas Explicada
+## Estructura de Carpetas Explicada
 
 ### backend/app/routers/
 Agrupa endpoints por funcionalidad:
@@ -184,7 +184,7 @@ Servicios y utilidades:
 - api.js: Cliente HTTP centralizado
 - storageService.js: LocalStorage
 
-## 🔐 Seguridad
+## Seguridad
 
 - Usar HTTPS en producción
 - Guardar tokens en httpOnly cookies
@@ -192,7 +192,7 @@ Servicios y utilidades:
 - Usar CORS adecuadamente
 - Nunca guardar secretos en código
 
-## 🐛 Debugging
+## Debugging
 
 ### Frontend
 - Abre DevTools (F12)
@@ -206,7 +206,7 @@ Servicios y utilidades:
 - Swagger UI en /docs para testear endpoints
 - Ver status HTTP en respuestas
 
-## 📞 Soporte
+## Soporte
 
 Para más detalles:
 - Lee el README específico de cada carpeta

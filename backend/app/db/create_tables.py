@@ -1,9 +1,10 @@
 from app.db.database import Base, engine
-from app.models.epmloyees import Employee
-from app.models.profile import  Profile
+from app.models.employee import Employee
+from app.models.profile import Profile
 from app.models.project import Project
+from app.models.embedding import Embedding
+from app.models.required_profile import RequiredProfile
 from app.models.employee_project import employee_project
-from app.models.embeding_table import embeding_table
 from sqlalchemy import inspect
 
 

@@ -13,36 +13,29 @@ class RequiredProfileService:
     def __init__(self):
         self.db = SessionLocal()
 
-    def add_required_profile(self, project_id: int, profile_id: int):
+    def add_required_profile(self, project_id: int, hard_skills: str, soft_skills: str, languages: str):
         """Agrega un perfil requerido a un proyecto"""
         try:
-            # Verificar que no exista ya
-            existing = self.db.query(RequiredProfile).filter(
-                RequiredProfile.project_id == project_id,
-                RequiredProfile.profile_id == profile_id
-            ).first()
-            
-            if existing:
-                return False  # Ya existe
-            
             required = RequiredProfile(
                 project_id=project_id,
-                profile_id=profile_id
+                hard_skills=hard_skills,
+                soft_skills=soft_skills,
+                languages=languages
             )
             self.db.add(required)
             self.db.commit()
-            return True
+            self.db.refresh(required)
+            return required
         except Exception as e:
             self.db.rollback()
             print(f"Error agregando perfil requerido: {e}")
-            return False
+            return None
 
-    def remove_required_profile(self, project_id: int, profile_id: int):
-        """Elimina un perfil requerido de un proyecto"""
+    def remove_required_profile(self, required_profile_id: int):
+        """Elimina un perfil requerido por su ID"""
         try:
             self.db.query(RequiredProfile).filter(
-                RequiredProfile.project_id == project_id,
-                RequiredProfile.profile_id == profile_id
+                RequiredProfile.id == required_profile_id
             ).delete()
             self.db.commit()
             return True
@@ -61,45 +54,14 @@ class RequiredProfileService:
             print(f"Error obteniendo perfiles requeridos: {e}")
             return []
 
-    def get_projects_requiring_profile(self, profile_id: int):
-        """Obtiene todos los proyectos que requieren un perfil específico"""
-        try:
-            return self.db.query(RequiredProfile).filter(
-                RequiredProfile.profile_id == profile_id
-            ).all()
-        except Exception as e:
-            print(f"Error obteniendo proyectos: {e}")
-            return []
 
-    def verify_employee_matches_project(self, employee_id: int, project_id: int):
-        """
-        Verifica si el perfil del empleado es uno de los requeridos para el proyecto.
-        Si no hay perfiles requeridos, retorna True (cualquiera puede trabajar).
-        """
+    def get_all(self):
+        """Obtiene todos los perfiles requeridos"""
         try:
-            from app.services.service_layer.employee_service import EmployeeService
-            
-            emp_service = EmployeeService()
-            employee = emp_service.get_with_profile(employee_id)
-            
-            if not employee or not employee.profile:
-                return False
-            
-            required_profiles = self.get_required_profiles_for_project(project_id)
-            
-            # Si no hay perfiles requeridos, cualquiera puede trabajar
-            if not required_profiles:
-                return True
-            
-            # Verificar si el perfil del empleado está en los requeridos
-            for rp in required_profiles:
-                if rp.profile_id == employee.profile_id:
-                    return True
-            
-            return False
+            return self.db.query(RequiredProfile).all()
         except Exception as e:
-            print(f"Error verificando compatibilidad: {e}")
-            return False
+            print(f"Error obteniendo todos los perfiles requeridos: {e}")
+            return []
 
     def close(self):
         """Cierra la sesión de la base de datos"""

@@ -76,19 +76,20 @@ class EmbeddingService:
 
             # Primero, intentar eliminar embedding anterior si existe
             sql_delete = text("""
-                DELETE FROM embeding_table 
-                WHERE id_employee = :employee_id
+                DELETE FROM embeddings 
+                WHERE profile_id = :profile_id
             """)
-            self.db.execute(sql_delete, {"employee_id": employee_id})
+            self.db.execute(sql_delete, {"profile_id": employee.profile.id})
 
-            # Guardar en tabla embedding_table usando pgvector
-            # pgvector convierte automáticamente la lista a vector
+            # Guardar en tabla embeddings usando pgvector
+            # Convertir el array a formato string compatible con pgvector: [1.0, 2.0, 3.0, ...]
+            vector_str = "[" + ",".join(str(x) for x in embedding) + "]"
             sql_insert = text("""
-                INSERT INTO embeding_table (id_employee, vector)
-                VALUES (:employee_id, :vector::vector)
+                INSERT INTO embeddings (profile_id, vector, created_at)
+                VALUES (:profile_id, CAST(:vector_str AS vector), NOW())
             """)
 
-            self.db.execute(sql_insert, {"employee_id": employee_id, "vector": embedding.tolist()})
+            self.db.execute(sql_insert, {"profile_id": employee.profile.id, "vector_str": vector_str})
             self.db.commit()
 
             return True
@@ -131,11 +132,16 @@ class EmbeddingService:
             np.ndarray o None: El embedding si existe (384 dimensiones)
         """
         try:
+            # Obtener el perfil del empleado
+            employee = self.employee_service.get_by_id(employee_id)
+            if not employee or not employee.profile:
+                return None
+
             sql = text("""
-                SELECT vector FROM embeding_table
-                WHERE id_employee = :employee_id
+                SELECT vector FROM embeddings
+                WHERE profile_id = :profile_id
             """)
-            result = self.db.execute(sql, {"employee_id": employee_id}).first()
+            result = self.db.execute(sql, {"profile_id": employee.profile.id}).first()
 
             if result:
                 # pgvector devuelve el vector como una lista o objeto vector
@@ -166,23 +172,29 @@ class EmbeddingService:
             List[tuple]: Lista de (employee_id, similarity_score)
         """
         try:
+            # Obtener el perfil del empleado
+            employee = self.employee_service.get_by_id(employee_id)
+            if not employee or not employee.profile:
+                return []
+
             # PostgreSQL con pgvector: usando <=> para distancia euclidiana
             # Para similitud coseno normalizada, usar 1 - (vector <#> vector_ref)
             sql = text("""
-                SELECT id_employee, 
-                       1 - (vector <#> (
-                           SELECT vector FROM embeding_table 
-                           WHERE id_employee = :employee_id
+                SELECT e.id as employee_id, 
+                       1 - (emb.vector <#> (
+                           SELECT vector FROM embeddings 
+                           WHERE profile_id = :profile_id
                        )) as similarity
-                FROM embeding_table
-                WHERE id_employee != :employee_id
+                FROM embeddings emb
+                JOIN employees e ON e.profile_id = emb.profile_id
+                WHERE emb.profile_id != :profile_id
                 ORDER BY similarity DESC
                 LIMIT :top_k
             """)
 
             results = self.db.execute(
                 sql,
-                {"employee_id": employee_id, "top_k": top_k}
+                {"profile_id": employee.profile.id, "top_k": top_k}
             ).fetchall()
 
             return [(row[0], float(row[1])) for row in results]
@@ -211,9 +223,10 @@ class EmbeddingService:
             
             # Buscar empleados similares
             sql = text("""
-                SELECT id_employee, 
-                       1 - (vector <#> :search_vector::vector) as similarity
-                FROM embeding_table
+                SELECT e.id as employee_id, 
+                       1 - (emb.vector <#> :search_vector::vector) as similarity
+                FROM embeddings emb
+                JOIN employees e ON e.profile_id = emb.profile_id
                 ORDER BY similarity DESC
                 LIMIT :top_k
             """)

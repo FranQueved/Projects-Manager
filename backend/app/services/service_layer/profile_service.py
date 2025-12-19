@@ -48,7 +48,7 @@ class ProfileService:
 
     def get_by_skill(self, skill: str) -> List[Profile]:
         """Obtiene perfiles que contienen una habilidad específica."""
-        return self.db.query(Profile).filter(Profile.hardSkills.ilike(f"%{skill}%")).all()
+        return self.db.query(Profile).filter(Profile.hard_skills.ilike(f"%{skill}%")).all()
 
     def get_by_language(self, language: str) -> List[Profile]:
         """Obtiene perfiles que contienen un idioma específico."""
@@ -61,13 +61,13 @@ class ProfileService:
         """
         profile = self.get_by_id(profile_id)
         if profile:
-            # Combinar hardSkills, softSkills e idiomas
+            # Combinar hard_skills, soft_skills e idiomas
             # Reemplazar comas y guiones con espacios para que el tokenizador los separe bien
             parts = []
-            if profile.hardSkills:
-                parts.append(profile.hardSkills.replace(",", " ").replace("-", " "))
-            if profile.softSkills:
-                parts.append(profile.softSkills.replace(",", " ").replace("-", " "))
+            if profile.hard_skills:
+                parts.append(profile.hard_skills.replace(",", " ").replace("-", " "))
+            if profile.soft_skills:
+                parts.append(profile.soft_skills.replace(",", " ").replace("-", " "))
             if profile.languages:
                 parts.append(profile.languages.replace(",", " ").replace("-", " "))
             
