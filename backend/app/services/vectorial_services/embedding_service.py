@@ -1,6 +1,6 @@
 """
-Servicio para gestionar embeddings de perfiles de empleados.
-Genera y almacena embeddings en la tabla embedding_table.
+Servicio para gestionar embeddings de perfiles de empleados con pgvector.
+Genera y almacena embeddings en la tabla embedding_table usando PostgreSQL pgvector.
 """
 
 from typing import Optional, List
@@ -15,8 +15,11 @@ import numpy as np
 
 class EmbeddingService:
     """
-    Servicio para manejar embeddings de perfiles de empleados.
-    Genera embeddings a partir de los skills del perfil y los almacena en la BD.
+    Servicio para manejar embeddings de perfiles de empleados con pgvector.
+    
+    - Genera embeddings usando Sentence Transformers (384 dimensiones)
+    - Almacena en PostgreSQL con el tipo Vector de pgvector
+    - Permite búsquedas rápidas de similitud vectorial
     """
 
     def __init__(self):
@@ -32,7 +35,7 @@ class EmbeddingService:
             text: Texto a convertir en embedding
             
         Returns:
-            List[float] o None: El embedding como lista de floats
+            List[float] o None: El embedding como lista de floats (384 dimensiones)
         """
         try:
             embedding = string_a_embedding(text)
@@ -45,6 +48,9 @@ class EmbeddingService:
     def create_embedding_for_employee(self, employee_id: int) -> bool:
         """
         Genera un embedding para un empleado basado en su perfil profesional.
+        
+        Usa Sentence Transformers para generar embeddings de 384 dimensiones
+        y los almacena en PostgreSQL con pgvector.
         
         Args:
             employee_id: ID del empleado
@@ -65,11 +71,8 @@ class EmbeddingService:
                 print(f"   Perfil vacío para empleado {employee_id}")
                 return False
 
-            # Generar embedding
+            # Generar embedding (384 dimensiones, normalizado)
             embedding = string_a_embedding(profile_str)
-
-            # Convertir a lista para almacenar en BD
-            embedding_list = embedding.tolist()
 
             # Primero, intentar eliminar embedding anterior si existe
             sql_delete = text("""
@@ -78,14 +81,14 @@ class EmbeddingService:
             """)
             self.db.execute(sql_delete, {"employee_id": employee_id})
 
-            # Guardar en tabla embedding_table
+            # Guardar en tabla embedding_table usando pgvector
+            # pgvector convierte automáticamente la lista a vector
             sql_insert = text("""
                 INSERT INTO embeding_table (id_employee, vector)
-                VALUES (:employee_id, :vector)
+                VALUES (:employee_id, :vector::vector)
             """)
 
-            # PostgreSQL requiere que el array se envíe como string o como lista
-            self.db.execute(sql_insert, {"employee_id": employee_id, "vector": embedding_list})
+            self.db.execute(sql_insert, {"employee_id": employee_id, "vector": embedding.tolist()})
             self.db.commit()
 
             return True
@@ -119,13 +122,13 @@ class EmbeddingService:
 
     def get_employee_embedding(self, employee_id: int) -> Optional[np.ndarray]:
         """
-        Obtiene el embedding de un empleado.
+        Obtiene el embedding de un empleado desde pgvector.
         
         Args:
             employee_id: ID del empleado
             
         Returns:
-            np.ndarray o None: El embedding si existe
+            np.ndarray o None: El embedding si existe (384 dimensiones)
         """
         try:
             sql = text("""
@@ -135,7 +138,13 @@ class EmbeddingService:
             result = self.db.execute(sql, {"employee_id": employee_id}).first()
 
             if result:
-                return np.array(result[0], dtype=np.float32)
+                # pgvector devuelve el vector como una lista o objeto vector
+                vector_data = result[0]
+                if isinstance(vector_data, (list, tuple)):
+                    return np.array(vector_data, dtype=np.float32)
+                else:
+                    # Si es un objeto Vector de pgvector, convertir a array
+                    return np.array(list(vector_data), dtype=np.float32)
             return None
 
         except Exception as e:
@@ -144,7 +153,10 @@ class EmbeddingService:
 
     def find_similar_employees(self, employee_id: int, top_k: int = 5) -> List[tuple]:
         """
-        Encuentra empleados con perfiles similares usando similitud coseno.
+        Encuentra empleados con perfiles similares usando pgvector.
+        
+        Utiliza el operador <=> (distancia euclidiana) o <#> (similitud coseno negativa)
+        para búsquedas rápidas de vecinos más cercanos.
         
         Args:
             employee_id: ID del empleado de referencia
@@ -154,8 +166,8 @@ class EmbeddingService:
             List[tuple]: Lista de (employee_id, similarity_score)
         """
         try:
-            # PostgreSQL con pgvector usa el operador <-> para distancia euclidiana
-            # o <#> para similitud coseno negativa
+            # PostgreSQL con pgvector: usando <=> para distancia euclidiana
+            # Para similitud coseno normalizada, usar 1 - (vector <#> vector_ref)
             sql = text("""
                 SELECT id_employee, 
                        1 - (vector <#> (
@@ -173,11 +185,48 @@ class EmbeddingService:
                 {"employee_id": employee_id, "top_k": top_k}
             ).fetchall()
 
-            return [(row[0], row[1]) for row in results]
+            return [(row[0], float(row[1])) for row in results]
 
         except Exception as e:
             print(f"Error buscando empleados similares: {e}")
             return []
+
+    def find_similar_employees_by_text(self, text: str, top_k: int = 5) -> List[tuple]:
+        """
+        Encuentra empleados similares a un texto dado.
+        
+        Genera un embedding del texto y busca los empleados más similares.
+        Útil para búsquedas por skill, descripción, etc.
+        
+        Args:
+            text: Texto a buscar (skill, descripción, etc.)
+            top_k: Número de resultados similares a retornar
+            
+        Returns:
+            List[tuple]: Lista de (employee_id, similarity_score)
+        """
+        try:
+            # Generar embedding del texto
+            embedding = string_a_embedding(text)
+            
+            # Buscar empleados similares
+            sql = text("""
+                SELECT id_employee, 
+                       1 - (vector <#> :search_vector::vector) as similarity
+                FROM embeding_table
+                ORDER BY similarity DESC
+                LIMIT :top_k
+            """)
+
+            results = self.db.execute(
+                sql,
+                {"search_vector": embedding.tolist(), "top_k": top_k}
+            ).fetchall()
+
+            return [(row[0], float(row[1])) for row in results]
+
+        except Exception as e:
+            print(f"Error buscando por texto: {e}")
 
     def close(self):
         """Cierra la sesión de base de datos."""
