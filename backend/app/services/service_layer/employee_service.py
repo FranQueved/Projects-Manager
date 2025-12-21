@@ -19,6 +19,15 @@ class EmployeeService:
     def create_one(self, json_data: dict) -> Employee:
         """Crea un único empleado."""
         schema = EmployeeCreate(**json_data)
+        # Verificar que el perfil exista y no esté asignado
+        profile = self.db.query(Profile).filter(Profile.id == schema.profile_id).first()
+        if not profile:
+            raise ValueError(f"Perfil {schema.profile_id} no existe")
+
+        existing = self.db.query(Employee).filter(Employee.profile_id == schema.profile_id).first()
+        if existing:
+            raise ValueError(f"Perfil {schema.profile_id} ya está asignado al empleado {existing.id}")
+
         employee = Employee(**schema.dict())
         self.db.add(employee)
         self.db.commit()
@@ -30,6 +39,15 @@ class EmployeeService:
         created_employees = []
         for json_data in json_list:
             schema = EmployeeCreate(**json_data)
+            # Verificar perfil disponible
+            profile = self.db.query(Profile).filter(Profile.id == schema.profile_id).first()
+            if not profile:
+                raise ValueError(f"Perfil {schema.profile_id} no existe")
+
+            existing = self.db.query(Employee).filter(Employee.profile_id == schema.profile_id).first()
+            if existing:
+                raise ValueError(f"Perfil {schema.profile_id} ya está asignado al empleado {existing.id}")
+
             employee = Employee(**schema.dict())
             self.db.add(employee)
             created_employees.append(employee)
@@ -75,6 +93,19 @@ class EmployeeService:
         schema = EmployeeUpdate(**json_data)
         update_data = schema.dict(exclude_unset=True)
 
+        if "profile_id" in update_data:
+            new_profile_id = update_data["profile_id"]
+            profile = self.db.query(Profile).filter(Profile.id == new_profile_id).first()
+            if not profile:
+                raise ValueError(f"Perfil {new_profile_id} no existe")
+
+            existing = self.db.query(Employee).filter(
+                Employee.profile_id == new_profile_id,
+                Employee.id != employee_id
+            ).first()
+            if existing:
+                raise ValueError(f"Perfil {new_profile_id} ya está asignado al empleado {existing.id}")
+
         for field, value in update_data.items():
             setattr(employee, field, value)
 
@@ -107,6 +138,13 @@ class EmployeeService:
 
         profile = self.db.query(Profile).filter(Profile.id == profile_id).first()
         if not profile:
+            return False
+
+        existing = self.db.query(Employee).filter(
+            Employee.profile_id == profile_id,
+            Employee.id != employee_id
+        ).first()
+        if existing:
             return False
 
         employee.profile_id = profile_id

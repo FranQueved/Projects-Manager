@@ -2,6 +2,7 @@
 
 from app.schemas.employee import EmployeeCreate
 from app.models.employee import Employee
+from app.models.profile import Profile
 from app.db.database import SessionLocal
 
 class EmployeeCreator:
@@ -20,6 +21,15 @@ class EmployeeCreator:
         schema = EmployeeCreate(**json_data)
 
         # 2. Schema → Modelo SQLAlchemy
+        # Validar que el perfil exista y no esté asignado
+        profile = self.db.query(Profile).filter(Profile.id == schema.profile_id).first()
+        if not profile:
+            raise ValueError(f"Perfil {schema.profile_id} no existe")
+
+        existing = self.db.query(Employee).filter(Employee.profile_id == schema.profile_id).first()
+        if existing:
+            raise ValueError(f"Perfil {schema.profile_id} ya está asignado al empleado {existing.id}")
+
         employee = Employee(**schema.dict())
 
         # 3. Guardar en BD
@@ -40,6 +50,14 @@ class EmployeeCreator:
             schema = EmployeeCreate(**json_data)
 
             # 2. Schema → Modelo SQLAlchemy
+            profile = self.db.query(Profile).filter(Profile.id == schema.profile_id).first()
+            if not profile:
+                raise ValueError(f"Perfil {schema.profile_id} no existe")
+
+            existing = self.db.query(Employee).filter(Employee.profile_id == schema.profile_id).first()
+            if existing:
+                raise ValueError(f"Perfil {schema.profile_id} ya está asignado al empleado {existing.id}")
+
             employee = Employee(**schema.dict())
 
             # 3. Añadir a la sesión

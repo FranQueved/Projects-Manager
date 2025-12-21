@@ -10,12 +10,12 @@ class EmployeeBase(BaseModel):
 
 # Schema para crear un empleado (lo que envía el frontend)
 class EmployeeCreate(EmployeeBase):
-    pass
+    profile_id: int
 
 # Schema para leer un empleado (lo que devuelves al frontend)
 class EmployeeRead(EmployeeBase):
     id: int
-    profile_id: Optional[int] = None
+    profile_id: int
 
     class Config:
         orm_mode = True
@@ -24,3 +24,4 @@ class EmployeeRead(EmployeeBase):
 class EmployeeUpdate(BaseModel):
     name: Optional[str] = None
     office: Optional[str] = None
+    profile_id: Optional[int] = None

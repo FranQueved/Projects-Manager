@@ -21,7 +21,7 @@ class Profile(Base):
         created_at: Timestamp de creación
     
     Relaciones:
-        employee: Empleado que posee este perfil (0:1)
+        employee: Empleado que posee este perfil (1:1 obligatorio)
         required_by_projects: Proyectos que lo requieren (0:N)
     """
     

@@ -44,7 +44,7 @@ class ProfileService:
 
     def get_all(self) -> List[Profile]:
         """Obtiene todos los perfiles."""
-        return self.db.query(Profile).all()
+        return self.db.query(Profile).order_by(Profile.id).all()
 
     def get_by_skill(self, skill: str) -> List[Profile]:
         """Obtiene perfiles que contienen una habilidad específica."""

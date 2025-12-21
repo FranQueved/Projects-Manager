@@ -155,13 +155,14 @@ class SeedService:
 
         for i, employee_data in enumerate(EMPLOYEES_DATA, 1):
             try:
-                # Crear empleado
-                employee = self.employee_service.create_one(employee_data)
+                if i > len(profiles_created):
+                    raise ValueError("No hay perfiles suficientes para asignar a todos los empleados")
 
-                # Asignar perfil correspondiente
-                if i <= len(profiles_created):
-                    profile_id = profiles_created[i - 1].id
-                    self.employee_service.assign_profile_to_employee(employee.id, profile_id)
+                payload = dict(employee_data)
+                payload["profile_id"] = profiles_created[i - 1].id
+
+                # Crear empleado con su perfil asignado
+                self.employee_service.create_one(payload)
 
                 created_count += 1
                 if i % 10 == 0:
@@ -249,11 +250,67 @@ class SeedService:
             return 0
 
     def _create_embeddings(self):
-        """Genera embeddings para todos los empleados."""
+        """Genera embeddings para todos los empleados directamente."""
+        from sqlalchemy import text
+        from app.db.database import SessionLocal
+        from app.services.vectorial_services.embeding_creator import string_a_embedding
+        from app.models.employee import Employee
+        
+        created_count = 0
         try:
-            return self.embedding_service.create_embeddings_for_all_employees()
+            db = SessionLocal()
+            all_employees = db.query(Employee).all()
+            
+            if not all_employees:
+                print("   No hay empleados para generar embeddings")
+                return 0
+            
+            print(f"   Generando embeddings para {len(all_employees)} empleados...")
+            
+            for i, employee in enumerate(all_employees, 1):
+                try:
+                    # Validar que el empleado tenga perfil
+                    if not employee.profile:
+                        print(f"   [SKIP] Empleado {employee.id} no tiene perfil")
+                        continue
+                    
+                    # Crear texto del perfil
+                    profile_text = f"{employee.profile.hard_skills} {employee.profile.soft_skills} {employee.profile.languages}"
+                    
+                    # Generar embedding
+                    embedding = string_a_embedding(profile_text)
+                    if embedding is None:
+                        print(f"   [SKIP] No se pudo generar embedding para empleado {employee.id}")
+                        continue
+                    
+                    # Convertir a formato pgvector
+                    vector_str = "[" + ",".join(str(x) for x in embedding) + "]"
+                    
+                    # Insertar en BD
+                    sql_insert = text("""
+                        INSERT INTO embeddings (profile_id, vector, created_at)
+                        VALUES (:profile_id, CAST(:vector_str AS vector), NOW())
+                    """)
+                    
+                    db.execute(sql_insert, {
+                        "profile_id": employee.profile.id,
+                        "vector_str": vector_str
+                    })
+                    db.commit()
+                    created_count += 1
+                    
+                    if i % 10 == 0:
+                        print(f"   Embeddings generados {i}/{len(all_employees)}")
+                except Exception as inner_e:
+                    db.rollback()
+                    print(f"   [ERROR] Error generando embedding para empleado {employee.id}: {inner_e}")
+            
+            db.close()
+            return created_count
         except Exception as e:
-            print(f"   ⚠️  Error generando embeddings: {e}")
+            print(f"   [ERROR] Error en proceso de embeddings de empleados: {e}")
+            import traceback
+            traceback.print_exc()
             return 0
 
     def _create_required_profiles(self):
@@ -267,6 +324,10 @@ class SeedService:
                 print("   ⚠️  No hay datos de perfiles disponibles")
                 return 0
             
+            if not all_projects:
+                print("   ⚠️  No hay proyectos disponibles")
+                return 0
+            
             for project in all_projects:
                 # Generar entre 1 y 4 perfiles requeridos aleatoriamente
                 num_required = random.randint(1, 4)
@@ -275,78 +336,89 @@ class SeedService:
                     # Seleccionar un perfil aleatorio como base para los requerimientos
                     profile_data = random.choice(PROFILES_DATA)
                     
-                    success = self.required_profile_service.add_required_profile(
-                        project_id=project.id,
-                        hard_skills=profile_data["hard_skills"],
-                        soft_skills=profile_data["soft_skills"],
-                        languages=profile_data["languages"]
-                    )
-                    if success:
-                        created_count += 1
+                    try:
+                        result = self.required_profile_service.add_required_profile(
+                            project_id=project.id,
+                            hard_skills=profile_data["hard_skills"],
+                            soft_skills=profile_data["soft_skills"],
+                            languages=profile_data["languages"]
+                        )
+                        if result:  # result es un objeto RequiredProfile o None
+                            created_count += 1
+                    except Exception as inner_e:
+                        print(f"   ⚠️  Error creando required_profile para proyecto {project.id}: {inner_e}")
             
             print(f"   Creados {created_count} perfiles requeridos")
             return created_count
             
         except Exception as e:
             print(f"   ⚠️  Error creando perfiles requeridos: {e}")
+            import traceback
+            traceback.print_exc()
             return 0
 
     def _create_required_profile_embeddings(self):
-        """Genera embeddings para todos los perfiles requeridos."""
+        """Genera embeddings para todos los perfiles requeridos directamente."""
+        from sqlalchemy import text
+        from app.db.database import SessionLocal
+        from app.services.vectorial_services.embeding_creator import string_a_embedding
+        
+        created_count = 0
         try:
-            from app.services.service_layer.required_profile_service import RequiredProfileService
-            
-            rp_service = RequiredProfileService()
-            all_required = rp_service.get_all()
-            success_count = 0
+            # Obtener todos los required_profiles
+            from app.models.required_profile import RequiredProfile
+            db = SessionLocal()
+            all_required = db.query(RequiredProfile).all()
             
             if not all_required:
-                print("   ⚠️  No hay perfiles requeridos disponibles")
+                print("   No hay required_profiles para generar embeddings")
                 return 0
             
-            for i, required_profile in enumerate(all_required, 1):
+            print(f"   Generando embeddings para {len(all_required)} required_profiles...")
+            
+            for i, req_profile in enumerate(all_required, 1):
                 try:
-                    # Generar embedding para el perfil requerido usando sus propios campos
-                    profile_text = f"{required_profile.hard_skills} {required_profile.soft_skills} {required_profile.languages}"
-                    embedding_vector = self.embedding_service.generate_embedding(profile_text)
+                    # Crear texto del perfil
+                    profile_text = f"{req_profile.hard_skills} {req_profile.soft_skills} {req_profile.languages}"
                     
-                    if embedding_vector:
-                        # Guardar embedding en tabla embeddings
-                        from sqlalchemy import text
-                        from app.db.database import SessionLocal
-                        
-                        db = SessionLocal()
-                        vector_str = "[" + ",".join(str(x) for x in embedding_vector) + "]"
-
-                        sql_delete = text("""
-                            DELETE FROM embeddings 
-                            WHERE required_profile_id = :required_profile_id
-                        """)
-
-                        sql_insert = text("""
-                            INSERT INTO embeddings (required_profile_id, vector, created_at)
-                            VALUES (:required_profile_id, CAST(:vector_str AS vector), NOW())
-                        """)
-
-                        db.execute(sql_delete, {"required_profile_id": required_profile.id})
-                        db.execute(sql_insert, {
-                            "required_profile_id": required_profile.id, 
-                            "vector_str": vector_str
-                        })
-                        db.commit()
-                        db.close()
-                        success_count += 1
+                    # Generar embedding
+                    embedding = string_a_embedding(profile_text)
+                    if embedding is None:
+                        print(f"   [SKIP] No se pudo generar embedding para required_profile {req_profile.id}")
+                        continue
+                    
+                    # Convertir a formato pgvector
+                    vector_str = "[" + ",".join(str(x) for x in embedding) + "]"
+                    
+                    # Insertar en BD
+                    sql_insert = text("""
+                        INSERT INTO embeddings (required_profile_id, vector, created_at)
+                        VALUES (:required_profile_id, CAST(:vector_str AS vector), NOW())
+                    """)
+                    
+                    db.execute(sql_insert, {
+                        "required_profile_id": req_profile.id,
+                        "vector_str": vector_str
+                    })
+                    db.commit()
+                    created_count += 1
                     
                     if i % 10 == 0:
-                        print(f"   Embeddings generados {i}/{len(all_required)}")
+                        print(f"   Embeddings creados {i}/{len(all_required)}")
                         
-                except Exception as e:
-                    print(f"   ⚠️  Error generando embedding para required_profile {required_profile.id}: {e}")
+                except Exception as inner_e:
+                    print(f"   [ERROR] Error en required_profile {req_profile.id}: {inner_e}")
+                    db.rollback()
+                    continue
             
-            return success_count
+            db.close()
+            print(f"   Creados {created_count} embeddings de required_profiles")
+            return created_count
             
         except Exception as e:
-            print(f"   ⚠️  Error en proceso de embeddings de required_profiles: {e}")
+            print(f"   [ERROR] Error generando embeddings de required_profiles: {e}")
+            import traceback
+            traceback.print_exc()
             return 0
 
     def validate_data(self):
@@ -420,7 +492,7 @@ class SeedService:
             return validation_results
 
         except Exception as e:
-            print(f"❌ Error validando datos: {e}")
+            print(f"[ERROR] Error validando datos: {e}")
             validation_results["valid"] = False
             return validation_results
 
@@ -453,10 +525,10 @@ def seed_all(include_embeddings=True):
     if stats["success"]:
         # Validar datos
         service.validate_data()
-        print("\n✅ SEEDING COMPLETADO Y VALIDADO EXITOSAMENTE")
+        print("\n[SUCCESS] SEEDING COMPLETADO Y VALIDADO EXITOSAMENTE")
         return True
     else:
-        print("\n❌ SEEDING FALLIDO")
+        print("\n[ERROR] SEEDING FALLIDO")
         return False
 
 

@@ -10,6 +10,7 @@ from app.db.database import SessionLocal
 from app.services.vectorial_services.embeding_creator import string_a_embedding
 from app.services.service_layer.profile_service import ProfileService
 from app.services.service_layer.employee_service import EmployeeService
+from app.models.required_profile import RequiredProfile
 import numpy as np
 
 
@@ -73,6 +74,9 @@ class EmbeddingService:
 
             # Generar embedding (384 dimensiones, normalizado)
             embedding = string_a_embedding(profile_str)
+            if embedding is None:
+                print(f"   No se pudo generar embedding para empleado {employee_id}")
+                return False
 
             # Primero, intentar eliminar embedding anterior si existe
             sql_delete = text("""
@@ -96,6 +100,8 @@ class EmbeddingService:
 
         except Exception as e:
             print(f"   Error generando embedding para empleado {employee_id}: {e}")
+            import traceback
+            traceback.print_exc()
             self.db.rollback()
             return False
 
@@ -119,6 +125,77 @@ class EmbeddingService:
                     print(f"   [OK] Embeddings creados {i}/{len(all_employees)}")
 
         print(f"\n[OK] Embeddings creados exitosamente: {success_count}/{len(all_employees)}")
+        return success_count
+
+    def create_embedding_for_required_profile(self, required_profile_id: int) -> bool:
+        """Genera y persiste el embedding de un perfil requerido asociado a un proyecto."""
+        try:
+            print(f"   [DEBUG] Buscando required_profile {required_profile_id}")
+            required_profile = self.db.query(RequiredProfile).filter(RequiredProfile.id == required_profile_id).first()
+            if not required_profile or not required_profile.project_id:
+                print(f"   No se encontró perfil requerido con proyecto para ID: {required_profile_id}")
+                return False
+
+            print(f"   [DEBUG] Generando texto para required_profile {required_profile_id}")
+            profile_text = " ".join(
+                filter(None, [
+                    required_profile.hard_skills,
+                    required_profile.soft_skills,
+                    required_profile.languages,
+                ])
+            )
+
+            print(f"   [DEBUG] Generando embedding para required_profile {required_profile_id}")
+            embedding = string_a_embedding(profile_text)
+            if embedding is None:
+                print(f"   No se pudo generar embedding para required_profile {required_profile_id}")
+                return False
+
+            sql_delete = text(
+                """
+                DELETE FROM embeddings 
+                WHERE required_profile_id = :required_profile_id
+                """
+            )
+            self.db.execute(sql_delete, {"required_profile_id": required_profile_id})
+
+            vector_str = "[" + ",".join(str(x) for x in embedding) + "]"
+            sql_insert = text(
+                """
+                INSERT INTO embeddings (required_profile_id, vector, created_at)
+                VALUES (:required_profile_id, CAST(:vector_str AS vector), NOW())
+                """
+            )
+
+            print(f"   [DEBUG] Insertando embedding para required_profile {required_profile_id}")
+            self.db.execute(sql_insert, {
+                "required_profile_id": required_profile_id,
+                "vector_str": vector_str
+            })
+            self.db.commit()
+            print(f"   [OK] Embedding de required_profile {required_profile_id} guardado")
+            return True
+        except Exception as e:
+            print(f"   Error generando embedding para required_profile {required_profile_id}: {e}")
+            import traceback
+            traceback.print_exc()
+            self.db.rollback()
+            return False
+
+    def create_embeddings_for_required_profiles(self) -> int:
+        """Genera embeddings para todos los perfiles requeridos con proyecto asociado."""
+        all_required = self.db.query(RequiredProfile).filter(RequiredProfile.project_id != None).all()  # noqa: E711
+        print(f"   [DEBUG] Encontrados {len(all_required)} required_profiles para generar embeddings")
+        success_count = 0
+
+        for i, required_profile in enumerate(all_required, 1):
+            print(f"   [DEBUG] Procesando required_profile {i}/{len(all_required)}, id={required_profile.id}")
+            if self.create_embedding_for_required_profile(required_profile.id):
+                success_count += 1
+                if i % 10 == 0:
+                    print(f"   [OK] Embeddings de required_profiles {i}/{len(all_required)}")
+
+        print(f"   [DEBUG] Total embeddings de required_profiles creados: {success_count}")
         return success_count
 
     def get_employee_embedding(self, employee_id: int) -> Optional[np.ndarray]:

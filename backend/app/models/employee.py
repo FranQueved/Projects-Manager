@@ -33,7 +33,7 @@ class Employee(Base):
     created_at = Column(DateTime, default=func.now(), nullable=False)
 
     # Relación 1:1 con Profile
-    profile_id = Column(Integer, ForeignKey("profiles.id", ondelete="SET NULL"), unique=True, nullable=True)
+    profile_id = Column(Integer, ForeignKey("profiles.id", ondelete="CASCADE"), unique=True, nullable=False)
     profile = relationship(
         "Profile",
         back_populates="employee",

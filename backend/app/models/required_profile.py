@@ -1,44 +1,40 @@
 """
-Modelo de Perfil Requerido por Proyecto.
+Modelo de Perfil Profesional Requerido.
 
-Representa la relación N:M entre proyectos y perfiles requeridos.
-Define qué perfiles profesionales son necesarios para ejecutar un proyecto.
+Replica la estructura de Profile para reutilizar la definición con un nombre distinto.
 """
 
-from sqlalchemy import Column, Integer, ForeignKey, String, DateTime, func
+from sqlalchemy import Column, Integer, String, DateTime, func, ForeignKey
 from sqlalchemy.orm import relationship
 from app.db.database import Base
 
 
 class RequiredProfile(Base):
     """
-    Representa un perfil requerido por un proyecto (relación N:M).
+    Representa un perfil profesional requerido con habilidades y competencias.
     
     Atributos:
         id: Identificador único
-        project_id: ID del proyecto que requiere el perfil
-        hard_skills: Habilidades técnicas requeridas
-        soft_skills: Habilidades blandas requeridas
-        languages: Idiomas requeridos
+        project_id: Proyecto al que pertenece (relación 1:N)
+        hard_skills: Habilidades técnicas requeridas/poseer (ej: Python, SQL, Docker)
+        soft_skills: Habilidades blandas (ej: Liderazgo, Comunicación)
+        languages: Lenguajes de programación/idiomas dominados
         created_at: Timestamp de creación
-    
+
     Relaciones:
-        project: El proyecto que requiere este perfil
+        project: Proyecto que requiere este perfil (1:N)
     """
     
     __tablename__ = "required_profiles"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     project_id = Column(Integer, ForeignKey("projects.id", ondelete="CASCADE"), nullable=False, index=True)
-    
     hard_skills = Column(String, nullable=False)
     soft_skills = Column(String, nullable=False)
     languages = Column(String, nullable=False)
-    
     created_at = Column(DateTime, default=func.now(), nullable=False)
 
-    # Relaciones
     project = relationship("Project", back_populates="required_profiles", foreign_keys=[project_id])
 
     def __repr__(self):
-        return f"<RequiredProfile(id={self.id}, project_id={self.project_id})>"
+        return f"<RequiredProfile(id={self.id}, project_id={self.project_id}, skills='{self.hard_skills[:30]}...')>"
