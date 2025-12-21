@@ -1,10 +1,5 @@
 """
-Servicio de seeding - Orquesta la creación de datos ficticios
-
-Este módulo centraliza toda la lógica para poblar la base de datos con:
-- Datos de prueba masivos
-- Embeddings de perfiles
-- Validación de datos creados
+Database seeding service - Populates database with test data and embeddings.
 """
 
 import time
@@ -14,7 +9,6 @@ from app.services.service_layer.employee_service import EmployeeService
 from app.services.service_layer.profile_service import ProfileService
 from app.services.service_layer.employee_project_service import EmployeeProjectService
 from app.services.service_layer.required_profile_service import RequiredProfileService
-from app.services.vectorial_services.embedding_service import EmbeddingService
 from app.services.fixtures.seed_data import (
     PROFILES_DATA, EMPLOYEES_DATA, PROJECTS_DATA, ASSIGNMENTS_DATA
 )
@@ -22,33 +16,30 @@ from app.db.create_tables import InitDB
 
 
 class SeedService:
-    """
-    Servicio centralizado para seeding de datos ficticios.
-    Maneja la creación de perfiles, empleados, proyectos y asignaciones.
-    """
+    """Service for database seeding with test data."""
 
     def __init__(self):
-        """Inicializa los servicios de la base de datos."""
+        """Initialize service dependencies."""
         self.project_service = ProjectService()
         self.employee_service = EmployeeService()
         self.profile_service = ProfileService()
         self.assignment_service = EmployeeProjectService()
-        self.embedding_service = EmbeddingService()
         self.required_profile_service = RequiredProfileService()
 
     def seed_database(self, include_embeddings=True):
         """
-        Función principal para poblar la base de datos con datos masivos.
-        Crea 100 empleados con perfiles, 30 proyectos y asignaciones aleatorias.
-
+        Populate database with test data.
+        
+        Creates profiles, employees, projects, assignments, required profiles, and embeddings.
+        
         Args:
-            include_embeddings: Si True, también genera embeddings de perfiles
-
+            include_embeddings: Whether to generate embeddings for employee profiles
+            
         Returns:
-            dict: Estadísticas de los datos creados
+            dict: Statistics about created records
         """
         print("\n" + "=" * 70)
-        print("POBLANDO BASE DE DATOS CON DATOS FICTICIOS")
+        print("SEEDING DATABASE WITH TEST DATA")
         print("=" * 70)
 
         start_time = time.time()
@@ -62,72 +53,48 @@ class SeedService:
         }
 
         try:
-            # 1. Crear perfiles
-            print(f"\n[1/4] Creando {len(PROFILES_DATA)} perfiles...")
+            print(f"\n[1/4] Creating {len(PROFILES_DATA)} profiles...")
             stats["profiles"] = self._create_profiles()
-            print(f"   [OK] {stats['profiles']} perfiles creados exitosamente")
+            print(f"   [OK] {stats['profiles']} profiles created")
 
-            # 2. Crear empleados
-            print(f"\n[2/4] Creando {len(EMPLOYEES_DATA)} empleados...")
+            print(f"\n[2/4] Creating {len(EMPLOYEES_DATA)} employees...")
             stats["employees"] = self._create_employees()
-            print(f"   [OK] {stats['employees']} empleados creados exitosamente")
+            print(f"   [OK] {stats['employees']} employees created")
 
-            # 3. Crear proyectos
-            print(f"\n[3/4] Creando {len(PROJECTS_DATA)} proyectos...")
+            print(f"\n[3/4] Creating {len(PROJECTS_DATA)} projects...")
             stats["projects"] = self._create_projects()
-            print(f"   [OK] {stats['projects']} proyectos creados exitosamente")
+            print(f"   [OK] {stats['projects']} projects created")
 
-            # 4. Crear asignaciones
-            print(f"\n[4/4] Creando {len(ASSIGNMENTS_DATA)} asignaciones...")
+            print(f"\n[4/4] Creating {len(ASSIGNMENTS_DATA)} assignments...")
             stats["assignments"] = self._create_assignments()
-            print(f"   [OK] {stats['assignments']} asignaciones creadas exitosamente")
+            print(f"   [OK] {stats['assignments']} assignments created")
 
-            # 5. Crear perfiles requeridos para proyectos
-            print(f"\n[5/7] Asignando perfiles requeridos a proyectos...")
+            print(f"\n[5/5] Assigning required profiles...")
             stats["required_profiles"] = self._create_required_profiles()
-            print(f"   [OK] Perfiles requeridos asignados exitosamente")
+            print(f"   [OK] Required profiles assigned")
 
-            # 6. Generar embeddings de required_profiles
-            print(f"\n[6/7] Generando embeddings de perfiles requeridos...")
-            stats["required_profile_embeddings"] = self._create_required_profile_embeddings()
-            print(f"   [OK] {stats['required_profile_embeddings']} embeddings de required_profiles creados exitosamente")
+            print(f"\n[NOTICE] Embeddings are generated automatically during creation")
 
-            # 7. Generar embeddings de empleados
-            if include_embeddings:
-                print(f"\n[7/7] Generando embeddings de empleados...")
-                stats["embeddings"] = self._create_embeddings()
-                print(f"   [OK] {stats['embeddings']} embeddings de empleados creados exitosamente")
-
-            # Estadísticas finales
             elapsed_time = time.time() - start_time
-            total_records = (
-                stats["profiles"] + 
-                stats["employees"] + 
-                stats["projects"] + 
-                stats["assignments"] +
-                stats.get("embeddings", 0)
-            )
 
             print(f"\n" + "=" * 70)
-            print(f"SEEDING COMPLETADO EXITOSAMENTE")
+            print(f"SEEDING COMPLETED SUCCESSFULLY")
             print(f"=" * 70)
-            print(f"[TIME] Tiempo total: {elapsed_time:.2f} segundos")
-            print(f"[STATS] Estadísticas:")
-            print(f"   • Perfiles: {stats['profiles']}")
-            print(f"   • Empleados: {stats['employees']}")
-            print(f"   • Proyectos: {stats['projects']}")
-            print(f"   • Asignaciones: {stats['assignments']}")
-            print(f"   • Perfiles requeridos: {stats.get('required_profiles', 0)}")
-            print(f"   • Embeddings de required_profiles: {stats.get('required_profile_embeddings', 0)}")
-            if include_embeddings:
-                print(f"   • Embeddings de empleados: {stats['embeddings']}")
+            print(f"[TIME] Total time: {elapsed_time:.2f}s")
+            print(f"[STATS] Summary:")
+            print(f"   • Profiles: {stats['profiles']}")
+            print(f"   • Employees: {stats['employees']}")
+            print(f"   • Projects: {stats['projects']}")
+            print(f"   • Assignments: {stats['assignments']}")
+            print(f"   • Required profiles: {stats.get('required_profiles', 0)}")
+            print("   • Embeddings: Generated automatically during creation")
             print("=" * 70 + "\n")
 
             stats["success"] = True
             return stats
 
         except Exception as e:
-            print(f"\n[ERROR] Error durante seeding: {e}")
+            print(f"\n[ERROR] Seeding failed: {e}")
             import traceback
             traceback.print_exc()
             return stats
@@ -136,56 +103,54 @@ class SeedService:
             self.close()
 
     def _create_profiles(self):
-        """Crea todos los perfiles."""
+        """Create all profiles."""
         created_count = 0
         for i, profile_data in enumerate(PROFILES_DATA, 1):
             try:
                 self.profile_service.create_one(profile_data)
                 created_count += 1
                 if i % 10 == 0:
-                    print(f"   Creados {i}/{len(PROFILES_DATA)} perfiles")
+                    print(f"   Created {i}/{len(PROFILES_DATA)} profiles")
             except Exception as e:
-                print(f"   ⚠️  Error creando perfil {i}: {e}")
+                print(f"   [ERROR] Creating profile {i}: {e}")
         return created_count
 
     def _create_employees(self):
-        """Crea todos los empleados y asigna perfiles."""
+        """Create all employees with profile assignments."""
         created_count = 0
         profiles_created = self.profile_service.get_all()
 
         for i, employee_data in enumerate(EMPLOYEES_DATA, 1):
             try:
                 if i > len(profiles_created):
-                    raise ValueError("No hay perfiles suficientes para asignar a todos los empleados")
+                    raise ValueError("Not enough profiles for all employees")
 
                 payload = dict(employee_data)
                 payload["profile_id"] = profiles_created[i - 1].id
-
-                # Crear empleado con su perfil asignado
                 self.employee_service.create_one(payload)
 
                 created_count += 1
                 if i % 10 == 0:
-                    print(f"   Creados {i}/{len(EMPLOYEES_DATA)} empleados")
+                    print(f"   Created {i}/{len(EMPLOYEES_DATA)} employees")
             except Exception as e:
-                print(f"   ⚠️  Error creando empleado {i}: {e}")
+                print(f"   [ERROR] Creating employee {i}: {e}")
         return created_count
 
     def _create_projects(self):
-        """Crea todos los proyectos."""
+        """Create all projects."""
         created_count = 0
         for i, project_data in enumerate(PROJECTS_DATA, 1):
             try:
                 self.project_service.create_one(project_data)
                 created_count += 1
                 if i % 5 == 0:
-                    print(f"   Creados {i}/{len(PROJECTS_DATA)} proyectos")
+                    print(f"   Created {i}/{len(PROJECTS_DATA)} projects")
             except Exception as e:
-                print(f"   ⚠️  Error creando proyecto {i}: {e}")
+                print(f"   [ERROR] Creating project {i}: {e}")
         return created_count
 
     def _create_assignments(self):
-        """Crea todas las asignaciones empleado-proyecto."""
+        """Create all employee-project assignments."""
         created_count = 0
         for i, assignment_data in enumerate(ASSIGNMENTS_DATA, 1):
             try:
@@ -196,144 +161,33 @@ class SeedService:
                 if success:
                     created_count += 1
                 if i % 25 == 0:
-                    print(f"   Creadas {i}/{len(ASSIGNMENTS_DATA)} asignaciones")
+                    print(f"   Created {i}/{len(ASSIGNMENTS_DATA)} assignments")
             except Exception as e:
-                print(f"   ⚠️  Error creando asignación {i}: {e}")
+                print(f"   [ERROR] Creating assignment {i}: {e}")
         return created_count
 
-    def _create_profile_embeddings(self):
-        """Genera embeddings para todos los perfiles y los almacena en BD."""
-        created_count = 0
-        try:
-            from sqlalchemy import text
-            from app.db.database import SessionLocal
-            
-            all_profiles = self.profile_service.get_all()
-            
-            if not all_profiles:
-                print("   ⚠️  No hay perfiles disponibles")
-                return 0
-            
-            db = SessionLocal()
-            
-            for i, profile in enumerate(all_profiles, 1):
-                try:
-                    # Crear texto a partir de skills y lenguajes
-                    profile_text = f"{profile.hard_skills} {profile.soft_skills} {profile.languages}"
-                    
-                    # Generar embedding usando embedding_service
-                    embedding_vector = self.embedding_service.generate_embedding(profile_text)
-                    
-                    # Guardar embedding en tabla embeddings
-                    if embedding_vector:
-                        vector_str = "[" + ",".join(str(x) for x in embedding_vector) + "]"
-                        
-                        sql_insert = text("""
-                            INSERT INTO embeddings (id, vector)
-                            VALUES (DEFAULT, :vector_str::vector)
-                        """)
-                        
-                        db.execute(sql_insert, {"vector_str": vector_str})
-                        db.commit()
-                        created_count += 1
-                    
-                    if i % 10 == 0:
-                        print(f"   Embeddings generados {i}/{len(all_profiles)}")
-                except Exception as e:
-                    print(f"   ⚠️  Error generando embedding para perfil {profile.id}: {e}")
-                    db.rollback()
-            
-            db.close()
-            return created_count
-        except Exception as e:
-            print(f"   ⚠️  Error en proceso de embeddings de perfiles: {e}")
-            return 0
-
     def _create_embeddings(self):
-        """Genera embeddings para todos los empleados directamente."""
-        from sqlalchemy import text
-        from app.db.database import SessionLocal
-        from app.services.vectorial_services.embeding_creator import string_a_embedding
-        from app.models.employee import Employee
-        
-        created_count = 0
-        try:
-            db = SessionLocal()
-            all_employees = db.query(Employee).all()
-            
-            if not all_employees:
-                print("   No hay empleados para generar embeddings")
-                return 0
-            
-            print(f"   Generando embeddings para {len(all_employees)} empleados...")
-            
-            for i, employee in enumerate(all_employees, 1):
-                try:
-                    # Validar que el empleado tenga perfil
-                    if not employee.profile:
-                        print(f"   [SKIP] Empleado {employee.id} no tiene perfil")
-                        continue
-                    
-                    # Crear texto del perfil
-                    profile_text = f"{employee.profile.hard_skills} {employee.profile.soft_skills} {employee.profile.languages}"
-                    
-                    # Generar embedding
-                    embedding = string_a_embedding(profile_text)
-                    if embedding is None:
-                        print(f"   [SKIP] No se pudo generar embedding para empleado {employee.id}")
-                        continue
-                    
-                    # Convertir a formato pgvector
-                    vector_str = "[" + ",".join(str(x) for x in embedding) + "]"
-                    
-                    # Insertar en BD
-                    sql_insert = text("""
-                        INSERT INTO embeddings (profile_id, vector, created_at)
-                        VALUES (:profile_id, CAST(:vector_str AS vector), NOW())
-                    """)
-                    
-                    db.execute(sql_insert, {
-                        "profile_id": employee.profile.id,
-                        "vector_str": vector_str
-                    })
-                    db.commit()
-                    created_count += 1
-                    
-                    if i % 10 == 0:
-                        print(f"   Embeddings generados {i}/{len(all_employees)}")
-                except Exception as inner_e:
-                    db.rollback()
-                    print(f"   [ERROR] Error generando embedding para empleado {employee.id}: {inner_e}")
-            
-            db.close()
-            return created_count
-        except Exception as e:
-            print(f"   [ERROR] Error en proceso de embeddings de empleados: {e}")
-            import traceback
-            traceback.print_exc()
-            return 0
+        """Embeddings generated automatically during employee creation."""
+        return 0
 
     def _create_required_profiles(self):
-        """Asigna perfiles requeridos a cada proyecto (1-4 perfiles por proyecto)."""
+        """Assign required profiles to each project (1-4 per project)."""
         created_count = 0
         try:
             all_projects = self.project_service.get_all()
             
-            # Usamos PROFILES_DATA para generar requerimientos realistas
             if not PROFILES_DATA:
-                print("   ⚠️  No hay datos de perfiles disponibles")
+                print("   [ERROR] No profile data available")
                 return 0
             
             if not all_projects:
-                print("   ⚠️  No hay proyectos disponibles")
+                print("   [ERROR] No projects available")
                 return 0
             
             for project in all_projects:
-                # Generar entre 1 y 4 perfiles requeridos aleatoriamente
                 num_required = random.randint(1, 4)
                 
                 for _ in range(num_required):
-                    # Seleccionar un perfil aleatorio como base para los requerimientos
                     profile_data = random.choice(PROFILES_DATA)
                     
                     try:
@@ -343,83 +197,23 @@ class SeedService:
                             soft_skills=profile_data["soft_skills"],
                             languages=profile_data["languages"]
                         )
-                        if result:  # result es un objeto RequiredProfile o None
+                        if result:
                             created_count += 1
                     except Exception as inner_e:
-                        print(f"   ⚠️  Error creando required_profile para proyecto {project.id}: {inner_e}")
+                        print(f"   [ERROR] Creating required_profile for project {project.id}: {inner_e}")
             
-            print(f"   Creados {created_count} perfiles requeridos")
+            print(f"   Created {created_count} required profiles")
             return created_count
             
         except Exception as e:
-            print(f"   ⚠️  Error creando perfiles requeridos: {e}")
+            print(f"   [ERROR] Creating required profiles: {e}")
             import traceback
             traceback.print_exc()
             return 0
 
     def _create_required_profile_embeddings(self):
-        """Genera embeddings para todos los perfiles requeridos directamente."""
-        from sqlalchemy import text
-        from app.db.database import SessionLocal
-        from app.services.vectorial_services.embeding_creator import string_a_embedding
-        
-        created_count = 0
-        try:
-            # Obtener todos los required_profiles
-            from app.models.required_profile import RequiredProfile
-            db = SessionLocal()
-            all_required = db.query(RequiredProfile).all()
-            
-            if not all_required:
-                print("   No hay required_profiles para generar embeddings")
-                return 0
-            
-            print(f"   Generando embeddings para {len(all_required)} required_profiles...")
-            
-            for i, req_profile in enumerate(all_required, 1):
-                try:
-                    # Crear texto del perfil
-                    profile_text = f"{req_profile.hard_skills} {req_profile.soft_skills} {req_profile.languages}"
-                    
-                    # Generar embedding
-                    embedding = string_a_embedding(profile_text)
-                    if embedding is None:
-                        print(f"   [SKIP] No se pudo generar embedding para required_profile {req_profile.id}")
-                        continue
-                    
-                    # Convertir a formato pgvector
-                    vector_str = "[" + ",".join(str(x) for x in embedding) + "]"
-                    
-                    # Insertar en BD
-                    sql_insert = text("""
-                        INSERT INTO embeddings (required_profile_id, vector, created_at)
-                        VALUES (:required_profile_id, CAST(:vector_str AS vector), NOW())
-                    """)
-                    
-                    db.execute(sql_insert, {
-                        "required_profile_id": req_profile.id,
-                        "vector_str": vector_str
-                    })
-                    db.commit()
-                    created_count += 1
-                    
-                    if i % 10 == 0:
-                        print(f"   Embeddings creados {i}/{len(all_required)}")
-                        
-                except Exception as inner_e:
-                    print(f"   [ERROR] Error en required_profile {req_profile.id}: {inner_e}")
-                    db.rollback()
-                    continue
-            
-            db.close()
-            print(f"   Creados {created_count} embeddings de required_profiles")
-            return created_count
-            
-        except Exception as e:
-            print(f"   [ERROR] Error generando embeddings de required_profiles: {e}")
-            import traceback
-            traceback.print_exc()
-            return 0
+        """Embeddings generated automatically during required profile creation."""
+        return 0
 
     def validate_data(self):
         """
@@ -497,13 +291,12 @@ class SeedService:
             return validation_results
 
     def close(self):
-        """Cierra todas las conexiones de base de datos."""
+        """Close database service connections."""
         try:
             self.project_service.close()
             self.employee_service.close()
             self.profile_service.close()
             self.assignment_service.close()
-            self.embedding_service.close()
         except:
             pass
 

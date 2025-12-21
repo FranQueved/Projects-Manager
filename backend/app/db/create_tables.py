@@ -1,3 +1,6 @@
+"""Database table initialization."""
+
+from sqlalchemy import inspect
 from app.db.database import Base, engine
 from app.models.employee import Employee
 from app.models.profile import Profile
@@ -5,34 +8,29 @@ from app.models.project import Project
 from app.models.embedding import Embedding
 from app.models.required_profile import RequiredProfile
 from app.models.employee_project import employee_project
-from sqlalchemy import inspect
-
 
 
 class InitDB:
+    """Database initialization utility."""
+
     @staticmethod
     def create_tables():
-        print("Verificando y creando tablas desde InitDB...")
+        """Create database tables if they don't exist."""
+        print("Initializing database tables...")
 
-        # Crear un inspector para verificar tablas existentes
         inspector = inspect(engine)
-
-        # Obtener todas las tablas definidas en los modelos
         tables_to_create = Base.metadata.tables.keys()
-
-        # Verificar cuáles tablas ya existen
         existing_tables = inspector.get_table_names()
-        tables_to_create_filtered = [table for table in tables_to_create if table not in existing_tables]
+        tables_to_create_filtered = [
+            table for table in tables_to_create if table not in existing_tables
+        ]
 
         if tables_to_create_filtered:
-            print(f"Creando {len(tables_to_create_filtered)} tabla(s) nueva(s): {', '.join(tables_to_create_filtered)}")
-            # Crear solo las tablas que no existen
+            print(f"Creating {len(tables_to_create_filtered)} new table(s): {', '.join(tables_to_create_filtered)}")
             Base.metadata.create_all(bind=engine, checkfirst=True)
-            print("Tablas creadas correctamente.")
+            print("Tables created successfully.")
         else:
-            print("Todas las tablas ya existen. No se creó ninguna tabla nueva.")
-
-
+            print("All tables already exist.")
 
 
 InitDB.create_tables()

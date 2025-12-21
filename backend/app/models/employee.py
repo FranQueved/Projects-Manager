@@ -1,7 +1,5 @@
 """
-Modelo de Empleado.
-
-Representa un empleado con su información de contacto, oficina y relación con un perfil profesional.
+Employee Model - Represents a company employee with profile and project assignments.
 """
 
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, func
@@ -10,20 +8,7 @@ from app.db.database import Base
 
 
 class Employee(Base):
-    """
-    Representa un empleado del sistema.
-    
-    Atributos:
-        id: Identificador único
-        name: Nombre completo del empleado
-        office: Ubicación/oficina del empleado
-        profile_id: Referencia al perfil profesional (relación 1:1)
-        created_at: Timestamp de creación
-    
-    Relaciones:
-        profile: Perfil profesional del empleado (1:1)
-        projects: Proyectos en los que trabaja (N:M)
-    """
+    """Company employee with professional profile and project assignments."""
     
     __tablename__ = "employees"
 
@@ -31,9 +16,13 @@ class Employee(Base):
     name = Column(String(255), nullable=False, index=True)
     office = Column(String(255), nullable=True)
     created_at = Column(DateTime, default=func.now(), nullable=False)
+    profile_id = Column(
+        Integer,
+        ForeignKey("profiles.id", ondelete="CASCADE"),
+        unique=True,
+        nullable=False
+    )
 
-    # Relación 1:1 con Profile
-    profile_id = Column(Integer, ForeignKey("profiles.id", ondelete="CASCADE"), unique=True, nullable=False)
     profile = relationship(
         "Profile",
         back_populates="employee",
@@ -41,7 +30,6 @@ class Employee(Base):
         foreign_keys=[profile_id]
     )
 
-    # Relación N:M con Projects
     projects = relationship(
         "Project",
         secondary="employee_project",

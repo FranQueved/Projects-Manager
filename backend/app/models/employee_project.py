@@ -1,8 +1,5 @@
 """
-Tabla Asociativa: Empleado-Proyecto.
-
-Establece la relación N:M entre empleados y proyectos.
-Un empleado puede trabajar en múltiples proyectos y un proyecto puede tener múltiples empleados.
+Employee-Project Association - Many-to-many relationship table.
 """
 
 from sqlalchemy import Table, Column, Integer, ForeignKey, DateTime, func

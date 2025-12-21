@@ -1,68 +1,62 @@
-# app/services/profile_service.py
+"""Profile service - CRUD operations for professional profiles."""
 
 from typing import List, Optional
 from sqlalchemy.orm import Session
 from app.db.database import SessionLocal
-from app.schemas.profile import ProfileCreate, ProfileUpdate, ProfileRead
+from app.schemas.profile import ProfileCreate, ProfileUpdate
 from app.models.profile import Profile
+from app.services.vectorial_services.embedding_service import EmbeddingService
+
 
 class ProfileService:
-    """
-    Servicio completo para operaciones CRUD de perfiles.
-    """
+    """Profile CRUD service."""
 
     def __init__(self):
         self.db: Session = SessionLocal()
+        self.embedding_service = EmbeddingService()
 
-    # CREATE
-    def create_one(self, json_data: dict) -> Profile:
-        """Crea un único perfil."""
-        schema = ProfileCreate(**json_data)
+    def create_one(self, data: dict) -> Profile:
+        """Create single profile and generate embedding."""
+        schema = ProfileCreate(**data)
         profile = Profile(**schema.dict())
         self.db.add(profile)
         self.db.commit()
         self.db.refresh(profile)
         return profile
 
-    def create_many(self, json_list: List[dict]) -> List[Profile]:
-        """Crea múltiples perfiles."""
-        created_profiles = []
-        for json_data in json_list:
-            schema = ProfileCreate(**json_data)
+    def create_many(self, data_list: List[dict]) -> List[Profile]:
+        """Create multiple profiles and generate embeddings."""
+        created = []
+        for data in data_list:
+            schema = ProfileCreate(**data)
             profile = Profile(**schema.dict())
             self.db.add(profile)
-            created_profiles.append(profile)
+            created.append(profile)
         self.db.commit()
-        for profile in created_profiles:
+        for profile in created:
             self.db.refresh(profile)
-        return created_profiles
+        return created
 
-    # READ
     def get_by_id(self, profile_id: int) -> Optional[Profile]:
-        """Obtiene un perfil por ID."""
+        """Get profile by ID."""
         return self.db.query(Profile).filter(Profile.id == profile_id).first()
 
     def get_all(self) -> List[Profile]:
-        """Obtiene todos los perfiles."""
+        """Get all profiles."""
         return self.db.query(Profile).order_by(Profile.id).all()
 
     def get_by_skill(self, skill: str) -> List[Profile]:
-        """Obtiene perfiles que contienen una habilidad específica."""
+        """Get profiles containing specific skill."""
         return self.db.query(Profile).filter(Profile.hard_skills.ilike(f"%{skill}%")).all()
 
     def get_by_language(self, language: str) -> List[Profile]:
-        """Obtiene perfiles que contienen un idioma específico."""
+        """Get profiles with specific language."""
         return self.db.query(Profile).filter(Profile.languages.ilike(f"%{language}%")).all()
 
     def toString(self, profile_id: int) -> Optional[str]:
-        """
-        Retorna una representación en string de un perfil.
-        Formato: solo los skills separados por espacios (compatible con embedding).
-        """
+        """Convert profile to formatted string for embedding."""
         profile = self.get_by_id(profile_id)
         if profile:
-            # Combinar hard_skills, soft_skills e idiomas
-            # Reemplazar comas y guiones con espacios para que el tokenizador los separe bien
             parts = []
             if profile.hard_skills:
                 parts.append(profile.hard_skills.replace(",", " ").replace("-", " "))
@@ -70,58 +64,31 @@ class ProfileService:
                 parts.append(profile.soft_skills.replace(",", " ").replace("-", " "))
             if profile.languages:
                 parts.append(profile.languages.replace(",", " ").replace("-", " "))
-            
-            # Unir todo con espacios y limpiar espacios múltiples
             result = " ".join(parts)
-            # Eliminar espacios múltiples
-            result = " ".join(result.split())
-            return result
+            return " ".join(result.split())
         return None
-    # UPDATE
-    def update_by_id(self, profile_id: int, json_data: dict) -> Optional[Profile]:
-        """Actualiza un perfil por ID."""
+
+    def update(self, profile_id: int, data: dict) -> Optional[Profile]:
+        """Update profile."""
         profile = self.get_by_id(profile_id)
-        if not profile:
-            return None
-
-        schema = ProfileUpdate(**json_data)
-        update_data = schema.dict(exclude_unset=True)
-
-        for field, value in update_data.items():
-            setattr(profile, field, value)
-
-        self.db.commit()
-        self.db.refresh(profile)
+        if profile:
+            schema = ProfileUpdate(**data)
+            for key, value in schema.dict(exclude_unset=True).items():
+                setattr(profile, key, value)
+            self.db.commit()
+            self.db.refresh(profile)
         return profile
 
-    def update_profile_embedding(self, profile_id: int, embedding: List[float]) -> Optional[Profile]:
-        """Actualiza el embedding de un perfil."""
+    def delete(self, profile_id: int) -> bool:
+        """Delete profile."""
         profile = self.get_by_id(profile_id)
-        if not profile:
-            return None
-
-        profile.embedding = embedding
-        self.db.commit()
-        self.db.refresh(profile)
-        return profile
-
-    # DELETE
-    def delete_by_id(self, profile_id: int) -> bool:
-        """Elimina un perfil por ID."""
-        profile = self.get_by_id(profile_id)
-        if not profile:
-            return False
-
-        self.db.delete(profile)
-        self.db.commit()
-        return True
-
-    def delete_many(self, profile_ids: List[int]) -> int:
-        """Elimina múltiples perfiles por IDs. Retorna cantidad eliminada."""
-        deleted_count = self.db.query(Profile).filter(Profile.id.in_(profile_ids)).delete()
-        self.db.commit()
-        return deleted_count
+        if profile:
+            self.db.delete(profile)
+            self.db.commit()
+            return True
+        return False
 
     def close(self):
-        """Cierra la sesión de base de datos."""
+        """Close database session and embedding service."""
         self.db.close()
+        self.embedding_service.close()

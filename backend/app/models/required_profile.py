@@ -1,7 +1,5 @@
 """
-Modelo de Perfil Profesional Requerido.
-
-Replica la estructura de Profile para reutilizar la definición con un nombre distinto.
+Required Profile Model - Professional skills required for a project.
 """
 
 from sqlalchemy import Column, Integer, String, DateTime, func, ForeignKey
@@ -10,20 +8,7 @@ from app.db.database import Base
 
 
 class RequiredProfile(Base):
-    """
-    Representa un perfil profesional requerido con habilidades y competencias.
-    
-    Atributos:
-        id: Identificador único
-        project_id: Proyecto al que pertenece (relación 1:N)
-        hard_skills: Habilidades técnicas requeridas/poseer (ej: Python, SQL, Docker)
-        soft_skills: Habilidades blandas (ej: Liderazgo, Comunicación)
-        languages: Lenguajes de programación/idiomas dominados
-        created_at: Timestamp de creación
-
-    Relaciones:
-        project: Proyecto que requiere este perfil (1:N)
-    """
+    """Professional profile required for project execution."""
     
     __tablename__ = "required_profiles"
 

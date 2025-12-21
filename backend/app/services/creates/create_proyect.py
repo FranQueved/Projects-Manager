@@ -1,60 +1,41 @@
-# app/utils/project_creator.py
+"""Project creation service - Create project records."""
 
+from typing import List
 from app.schemas.project import ProjectCreate
 from app.models.project import Project
 from app.db.database import SessionLocal
 
+
 class ProjectCreator:
-    """
-    Clase que permite crear uno o varios proyectos a partir de JSONs.
-    """
+    """Service for creating projects."""
 
     def __init__(self):
         self.db = SessionLocal()
 
-    def create_one(self, json_data: dict) -> Project:
-        """
-        Crea un único proyecto a partir de un JSON.
-        """
-        # 1. Validar JSON → Schema
-        schema = ProjectCreate(**json_data)
-
-        # 2. Schema → Modelo SQLAlchemy
+    def create_one(self, data: dict) -> Project:
+        """Create single project."""
+        schema = ProjectCreate(**data)
         project = Project(**schema.dict())
-
-        # 3. Guardar en BD
         self.db.add(project)
         self.db.commit()
         self.db.refresh(project)
-
         return project
 
-    def create_many(self, json_list: list[dict]) -> list[Project]:
-        """
-        Crea múltiples proyectos a partir de una lista de JSONs.
-        """
-        created_projects = []
-
-        for json_data in json_list:
-            # 1. Validar JSON → Schema
-            schema = ProjectCreate(**json_data)
-
-            # 2. Schema → Modelo SQLAlchemy
+    def create_many(self, data_list: List[dict]) -> List[Project]:
+        """Create multiple projects."""
+        created = []
+        for data in data_list:
+            schema = ProjectCreate(**data)
             project = Project(**schema.dict())
-
-            # 3. Añadir a la sesión
             self.db.add(project)
-            created_projects.append(project)
+            created.append(project)
 
-        # Commit único para optimizar rendimiento
         self.db.commit()
-
-        # Refrescar para obtener IDs
-        for project in created_projects:
+        for project in created:
             self.db.refresh(project)
 
-        return created_projects
+        return created
 
     def close(self):
-        """Cierra la sesión de base de datos."""
+        """Close database session."""
         self.db.close()

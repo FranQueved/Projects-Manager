@@ -1,57 +1,38 @@
+"""Embedding generation using Sentence Transformers (all-MiniLM-L6-v2)."""
+
 import numpy as np
 from sentence_transformers import SentenceTransformer
 
-# Modelo global para evitar cargar múltiples veces
-_modelo = None
+_model = None
 
-def _cargar_modelo():
-    """
-    Carga un modelo Sentence Transformers preentrenado.
-    
-    Usa 'all-MiniLM-L6-v2' que genera embeddings de 384 dimensiones,
-    optimizado para búsquedas de similitud entre frases/textos.
-    
-    Este modelo entiende el contexto semántico mejor que Word2Vec,
-    es rápido y eficiente, perfecto para usar con pgvector.
-    """
-    print("[*] Cargando modelo Sentence Transformers 'all-MiniLM-L6-v2'...")
-    modelo = SentenceTransformer('all-MiniLM-L6-v2')
-    print("[OK] Modelo cargado exitosamente (384 dimensiones, optimizado para pgvector)")
-    return modelo
 
-def string_a_embedding(texto: str) -> np.ndarray:
-    """
-    Convierte un string a un vector embedding usando Sentence Transformers.
-    
-    El modelo está optimizado para:
-    - Búsquedas de similitud semántica entre perfiles
-    - Comparación de skills y experiencias
-    - Matching entre empleados y proyectos
-    - Uso con pgvector en PostgreSQL
-    
-    Genera embeddings de 384 dimensiones que capturan similitud semántica profunda.
-    Los vectores están normalizados para funcionar óptimamente con pgvector.
+def _load_model():
+    """Load Sentence Transformers pre-trained model (384-dimensional)."""
+    print("[*] Loading Sentence Transformers model...")
+    model = SentenceTransformer('all-MiniLM-L6-v2')
+    print("[OK] Model loaded (384 dimensions)")
+    return model
+
+
+def string_a_embedding(text: str) -> np.ndarray:
+    """Convert text string to 384-dimensional normalized embedding vector.
     
     Args:
-        texto: String a convertir a embedding (perfil, descripción, skills, etc.)
+        text: Text to convert to embedding
         
     Returns:
-        np.ndarray: Vector embedding normalizado de dimensión 384 (float32)
+        np.ndarray: 384-dimensional normalized float32 vector
         
     Raises:
-        ValueError: Si el texto está vacío o no es válido
+        ValueError: If text is empty or invalid
     """
-    global _modelo
+    global _model
     
-    if not isinstance(texto, str) or not texto.strip():
-        raise ValueError("El texto debe ser un string no vacío.")
+    if not isinstance(text, str) or not text.strip():
+        raise ValueError("Text must be non-empty string.")
     
-    # Cargar modelo si no existe
-    if _modelo is None:
-        _modelo = _cargar_modelo()
+    if _model is None:
+        _model = _load_model()
     
-    # Generar embedding usando Sentence Transformers
-    # normalize_embeddings=True normaliza el vector para similitud coseno
-    embedding = _modelo.encode(texto, convert_to_numpy=True, normalize_embeddings=True)
-    
+    embedding = _model.encode(text, convert_to_numpy=True, normalize_embeddings=True)
     return embedding.astype(np.float32)
