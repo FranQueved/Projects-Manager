@@ -57,9 +57,9 @@ class SeedService:
             stats["profiles"] = self._create_profiles()
             print(f"   [OK] {stats['profiles']} profiles created")
 
-            print(f"\n[2/4] Creating {len(EMPLOYEES_DATA)} employees...")
-            stats["employees"] = self._create_employees()
-            print(f"   [OK] {stats['employees']} employees created")
+            print(f"\n[2/4] Creating {len(EMPLOYEES_DATA)} employees with inline profiles...")
+            stats["employees"] = self._create_employees_with_profiles()
+            print(f"   [OK] {stats['employees']} employees created (profiles auto-created)")
 
             print(f"\n[3/4] Creating {len(PROJECTS_DATA)} projects...")
             stats["projects"] = self._create_projects()
@@ -73,7 +73,7 @@ class SeedService:
             stats["required_profiles"] = self._create_required_profiles()
             print(f"   [OK] Required profiles assigned")
 
-            print(f"\n[NOTICE] Embeddings are generated automatically during creation")
+            print(f"\n[NOTICE] All embeddings generated automatically during creation")
 
             elapsed_time = time.time() - start_time
 
@@ -115,26 +115,32 @@ class SeedService:
                 print(f"   [ERROR] Creating profile {i}: {e}")
         return created_count
 
-    def _create_employees(self):
-        """Create all employees with profile assignments."""
+    def _create_employees_with_profiles(self):
+        """Create all employees with inline profile data (full automation)."""
         created_count = 0
-        profiles_created = self.profile_service.get_all()
-
+        
         for i, employee_data in enumerate(EMPLOYEES_DATA, 1):
             try:
-                if i > len(profiles_created):
-                    raise ValueError("Not enough profiles for all employees")
-
-                payload = dict(employee_data)
-                payload["profile_id"] = profiles_created[i - 1].id
-                self.employee_service.create_one(payload)
-
-                created_count += 1
-                if i % 10 == 0:
-                    print(f"   Created {i}/{len(EMPLOYEES_DATA)} employees")
+                # Use corresponding profile data for inline profile creation
+                if i <= len(PROFILES_DATA):
+                    profile_data = PROFILES_DATA[i - 1]
+                    payload = dict(employee_data)
+                    payload.update({
+                        "hard_skills": profile_data.get("hard_skills", ""),
+                        "soft_skills": profile_data.get("soft_skills", ""),
+                        "languages": profile_data.get("languages", "")
+                    })
+                    self.employee_service.create_one(payload)
+                    created_count += 1
+                    if i % 10 == 0:
+                        print(f"   Created {i}/{len(EMPLOYEES_DATA)} employees with profiles")
             except Exception as e:
                 print(f"   [ERROR] Creating employee {i}: {e}")
         return created_count
+
+    def _create_employees(self):
+        """Deprecated - use _create_employees_with_profiles instead."""
+        return 0
 
     def _create_projects(self):
         """Create all projects."""

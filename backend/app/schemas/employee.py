@@ -11,8 +11,11 @@ class EmployeeBase(BaseModel):
 
 
 class EmployeeCreate(EmployeeBase):
-    """Schema for creating employee."""
-    profile_id: int
+    """Schema for creating employee with optional profile data."""
+    profile_id: Optional[int] = None
+    hard_skills: Optional[str] = None
+    soft_skills: Optional[str] = None
+    languages: Optional[str] = None
 
 
 class EmployeeRead(EmployeeBase):

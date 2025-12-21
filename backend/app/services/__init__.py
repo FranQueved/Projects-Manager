@@ -14,6 +14,7 @@ from app.services.service_layer.project_service import ProjectService
 from app.services.service_layer.employee_service import EmployeeService
 from app.services.service_layer.profile_service import ProfileService
 from app.services.service_layer.employee_project_service import EmployeeProjectService
+from app.services.service_layer.required_profile_service import RequiredProfileService
 
 from app.services.creates.create_employee import EmployeeCreator
 from app.services.creates.create_profile import ProfileCreator
@@ -21,11 +22,12 @@ from app.services.creates.create_proyect import ProjectCreator
 
 
 __all__ = [
-	"ProjectService",
-	"EmployeeService",
-	"ProfileService",
-	"EmployeeProjectService",
-	"EmployeeCreator",
-	"ProfileCreator",
-	"ProjectCreator",
+    "ProjectService",
+    "EmployeeService",
+    "ProfileService",
+    "EmployeeProjectService",
+    "RequiredProfileService",
+    "EmployeeCreator",
+    "ProfileCreator",
+    "ProjectCreator",
 ]

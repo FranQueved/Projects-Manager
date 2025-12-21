@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from app.db.database import SessionLocal
 from app.schemas.profile import ProfileCreate, ProfileUpdate
 from app.models.profile import Profile
-from app.services.vectorial_services.embedding_service import EmbeddingService
+
 
 
 class ProfileService:
@@ -13,7 +13,6 @@ class ProfileService:
 
     def __init__(self):
         self.db: Session = SessionLocal()
-        self.embedding_service = EmbeddingService()
 
     def create_one(self, data: dict) -> Profile:
         """Create single profile and generate embedding."""
@@ -89,6 +88,5 @@ class ProfileService:
         return False
 
     def close(self):
-        """Close database session and embedding service."""
+        """Close database session."""
         self.db.close()
-        self.embedding_service.close()

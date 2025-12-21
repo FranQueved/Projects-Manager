@@ -2,31 +2,18 @@
 # MÓDULO BACKEND/APP/DB/__INIT__.PY
 # ==================================
 # 
-# CARPETA DB: Configuración y conexión a base de datos
+# Exporta componentes de base de datos para imports simplificados
 # 
-# ¿QUÉ VA AQUÍ?
-# 
-# database.py:
-#   - Configurar SQLAlchemy engine
-#   - Crear sesión de BD
-#   - Funciones para conectar/desconectar
-#   
-#   from sqlalchemy import create_engine
-#   from sqlalchemy.orm import sessionmaker
-#   
-#   DATABASE_URL = "postgresql://user:pass@localhost/db"
-#   engine = create_engine(DATABASE_URL)
-#   SessionLocal = sessionmaker(bind=engine)
-#   
-#   def get_db():
-#       db = SessionLocal()
-#       yield db
-#       db.close()
-# 
-# CÓMO SE USA EN LOS ROUTERS:
-# 
-# from fastapi import Depends
-# from app.db import get_db
+
+from app.db.database import SessionLocal, engine, Base
+from app.db.create_tables import InitDB
+
+__all__ = [
+    'SessionLocal',
+    'engine',
+    'Base',
+    'InitDB',
+]
 # 
 # @router.get("/users")
 # def get_users(db: Session = Depends(get_db)):

@@ -3,8 +3,32 @@
 # ================================
 # 
 # Este archivo hace que la carpeta 'app' sea un paquete de Python.
-# Sin este archivo, Python no reconocería 'app' como un paquete.
+# Exporta los módulos principales para imports simplificados.
 # 
-# El archivo puede estar vacío o contener inicializaciones del paquete.
-# En proyectos grandes, aquí se importan y configuran módulos principales.
-# 
+
+from app.db import SessionLocal, engine
+from app.db.create_tables import InitDB
+from app.services import (
+    ProjectService,
+    EmployeeService,
+    ProfileService,
+    RequiredProfileService,
+    EmployeeProjectService,
+    EmployeeCreator,
+    ProfileCreator,
+    ProjectCreator,
+)
+
+__all__ = [
+    'SessionLocal',
+    'engine',
+    'InitDB',
+    'ProjectService',
+    'EmployeeService',
+    'ProfileService',
+    'RequiredProfileService',
+    'EmployeeProjectService',
+    'EmployeeCreator',
+    'ProfileCreator',
+    'ProjectCreator',
+]
