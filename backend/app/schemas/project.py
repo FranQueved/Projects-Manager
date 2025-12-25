@@ -1,10 +1,11 @@
-# app/schemas/project.py
+"""Project request/response schemas."""
 
 from pydantic import BaseModel
 from datetime import date
 
-# Base: campos comunes entre entrada y salida
+
 class ProjectBase(BaseModel):
+    """Base project schema."""
     name: str
     description: str
     client: str = "Internal"
@@ -14,18 +15,20 @@ class ProjectBase(BaseModel):
     budget: int
     presential: bool = False
 
-# Schema para crear un proyecto (lo que envía el frontend)
+
 class ProjectCreate(ProjectBase):
+    """Schema for creating project."""
     pass
 
-# Schema para leer un proyecto (lo que devuelves al frontend)
+
 class ProjectRead(ProjectBase):
+    """Schema for reading project."""
     id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
-# Schema para actualizar un proyecto (lo que envía el frontend para actualizaciones)
 class ProjectUpdate(ProjectBase):
+    """Schema for updating project."""
     pass

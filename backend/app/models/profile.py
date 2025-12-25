@@ -1,22 +1,29 @@
-from sqlalchemy import Column, Integer, String, Float
-from sqlalchemy.dialects.postgresql import ARRAY
+"""
+Profile Model - Represents professional skills and competencies.
+"""
+
+from sqlalchemy import Column, Integer, String, DateTime, func
 from sqlalchemy.orm import relationship
 from app.db.database import Base
 
+
 class Profile(Base):
+    """Professional profile with technical and soft skills."""
+    
     __tablename__ = "profiles"
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    hardSkills = Column(String, nullable=False)
-    softSkills = Column(String, nullable=False)
+    hard_skills = Column(String, nullable=False)
+    soft_skills = Column(String, nullable=False)
     languages = Column(String, nullable=False)
-    embedding = Column(ARRAY(Float), nullable=True)  # Embedding del perfil para búsquedas vectoriales
+    created_at = Column(DateTime, default=func.now(), nullable=False)
 
-    # Relación con Employee (uno a uno)
-    employee = relationship("Employee", back_populates="profile", uselist=False)
-    
-    # Relación con proyectos que lo requieren (1:N)
-    required_by_projects = relationship(
-        "RequiredProfile",
-        back_populates="profile"
+    employee = relationship(
+        "Employee",
+        back_populates="profile",
+        uselist=False,
+        foreign_keys="Employee.profile_id"
     )
+
+    def __repr__(self):
+        return f"<Profile(id={self.id}, skills='{self.hard_skills[:30]}...')>"

@@ -1,45 +1,22 @@
-# 
-# MÓDULO BACKEND/APP/MODELS/__INIT__.PY
-# ======================================
-# 
-# CARPETA MODELS: Contiene definiciones de datos (esquemas y modelos)
-# 
-# ¿QUÉ VA AQUÍ?
-# 
-# 1. MODELOS PYDANTIC: Definen la estructura de datos que recibe/envía la API
-#    - Validan que los datos sean correctos
-#    - Documentación automática en Swagger
-#    Ejemplo: usuario.py, proyecto.py
-#    
-#    Clase: CreateUserRequest
-#    {
-#        "nombre": "Juan",
-#        "email": "juan@example.com"
-#    }
-# 
-# 2. MODELOS ORM (SQLAlchemy): Representan tablas en la base de datos
-#    - Definen la estructura de la BD
-#    - Mapean columnas a atributos de Python
-#    Ejemplo: models/user_model.py
-#    
-#    Tabla users:
-#    - id (INT, PK)
-#    - nombre (VARCHAR)
-#    - email (VARCHAR)
-# 
-# DIFERENCIA IMPORTANTE:
-# - Pydantic models: Para validación de datos en APIs
-# - SQLAlchemy models: Para mapeo de BD
-# 
-# Aquí importas y exportas todos los modelos para usarlos en otros módulos
-# 
+"""
+Modelos ORM de SQLAlchemy.
 
+Define la estructura de todas las tablas de la base de datos.
+"""
 
-from app.models.project import Project
-from app.models.epmloyees import Employee
+# Importar todos los modelos ORM para que SQLAlchemy los registre
+from app.models.employee import Employee
 from app.models.profile import Profile
+from app.models.project import Project
+from app.models.required_profile import RequiredProfile
+from app.models.embedding import Embedding
+from app.models.employee_project import employee_project
+
 __all__ = [
-    "Project",
     "Employee",
     "Profile",
+    "Project",
+    "RequiredProfile",
+    "Embedding",
+    "employee_project",
 ]

@@ -16,553 +16,553 @@ import random
 
 PROFILES_DATA = [
     {
-        "hardSkills": "Python, Django, PostgreSQL, REST APIs",
-        "softSkills": "Comunicación, Trabajo en equipo, Liderazgo",
+        "hard_skills": "Python, Django, PostgreSQL, REST APIs",
+        "soft_skills": "Comunicación, Trabajo en equipo, Liderazgo",
         "languages": "Español, Inglés"
     },
     {
-        "hardSkills": "JavaScript, React, Node.js, MongoDB",
-        "softSkills": "Creatividad, Resolución de problemas",
+        "hard_skills": "JavaScript, React, Node.js, MongoDB",
+        "soft_skills": "Creatividad, Resolución de problemas",
         "languages": "Español, Inglés, Francés"
     },
     {
-        "hardSkills": "Java, Spring Boot, MySQL, Microservicios",
-        "softSkills": "Análisis, Planificación estratégica",
+        "hard_skills": "Java, Spring Boot, MySQL, Microservicios",
+        "soft_skills": "Análisis, Planificación estratégica",
         "languages": "Español, Inglés"
     },
     {
-        "hardSkills": "C#, .NET, SQL Server, Azure",
-        "softSkills": "Adaptabilidad, Aprendizaje continuo",
+        "hard_skills": "C#, .NET, SQL Server, Azure",
+        "soft_skills": "Adaptabilidad, Aprendizaje continuo",
         "languages": "Español, Inglés, Alemán"
     },
     {
-        "hardSkills": "PHP, Laravel, MySQL, HTML/CSS",
-        "softSkills": "Atención al detalle, Paciencia",
+        "hard_skills": "PHP, Laravel, MySQL, HTML/CSS",
+        "soft_skills": "Atención al detalle, Paciencia",
         "languages": "Español, Inglés"
     },
     {
-        "hardSkills": "Ruby, Rails, PostgreSQL, AWS",
-        "softSkills": "Innovación, Pensamiento crítico",
+        "hard_skills": "Ruby, Rails, PostgreSQL, AWS",
+        "soft_skills": "Innovación, Pensamiento crítico",
         "languages": "Español, Inglés, Italiano"
     },
     {
-        "hardSkills": "Go, Docker, Kubernetes, Linux",
-        "softSkills": "Resiliencia, Trabajo bajo presión",
+        "hard_skills": "Go, Docker, Kubernetes, Linux",
+        "soft_skills": "Resiliencia, Trabajo bajo presión",
         "languages": "Español, Inglés"
     },
     {
-        "hardSkills": "Swift, iOS, Xcode, Core Data",
-        "softSkills": "Creatividad, Diseño UX/UI",
+        "hard_skills": "Swift, iOS, Xcode, Core Data",
+        "soft_skills": "Creatividad, Diseño UX/UI",
         "languages": "Español, Inglés, Catalán"
     },
     {
-        "hardSkills": "Kotlin, Android, Firebase, MVVM",
-        "softSkills": "Empatía, Comunicación efectiva",
+        "hard_skills": "Kotlin, Android, Firebase, MVVM",
+        "soft_skills": "Empatía, Comunicación efectiva",
         "languages": "Español, Inglés"
     },
     {
-        "hardSkills": "TypeScript, Angular, RxJS, NgRx",
-        "softSkills": "Mentoría, Desarrollo de equipos",
+        "hard_skills": "TypeScript, Angular, RxJS, NgRx",
+        "soft_skills": "Mentoría, Desarrollo de equipos",
         "languages": "Español, Inglés, Portugués"
     },
     {
-        "hardSkills": "Python, FastAPI, SQLAlchemy, Pydantic",
-        "softSkills": "Curiosidad, Aprendizaje autónomo",
+        "hard_skills": "Python, FastAPI, SQLAlchemy, Pydantic",
+        "soft_skills": "Curiosidad, Aprendizaje autónomo",
         "languages": "Español, Inglés"
     },
     {
-        "hardSkills": "JavaScript, Vue.js, Nuxt.js, GraphQL",
-        "softSkills": "Flexibilidad, Adaptabilidad",
+        "hard_skills": "JavaScript, Vue.js, Nuxt.js, GraphQL",
+        "soft_skills": "Flexibilidad, Adaptabilidad",
         "languages": "Español, Inglés, Japonés"
     },
     {
-        "hardSkills": "C++, Qt, OpenGL, Linux",
-        "softSkills": "Precisión, Análisis técnico",
+        "hard_skills": "C++, Qt, OpenGL, Linux",
+        "soft_skills": "Precisión, Análisis técnico",
         "languages": "Español, Inglés"
     },
     {
-        "hardSkills": "Scala, Play Framework, Akka, Cassandra",
-        "softSkills": "Visión estratégica, Planificación",
+        "hard_skills": "Scala, Play Framework, Akka, Cassandra",
+        "soft_skills": "Visión estratégica, Planificación",
         "languages": "Español, Inglés, Francés"
     },
     {
-        "hardSkills": "Rust, WebAssembly, Tokio, Async",
-        "softSkills": "Innovación, Experimentación",
+        "hard_skills": "Rust, WebAssembly, Tokio, Async",
+        "soft_skills": "Innovación, Experimentación",
         "languages": "Español, Inglés"
     },
     {
-        "hardSkills": "Dart, Flutter, Firebase, Provider",
-        "softSkills": "Creatividad, Diseño centrado en usuario",
+        "hard_skills": "Dart, Flutter, Firebase, Provider",
+        "soft_skills": "Creatividad, Diseño centrado en usuario",
         "languages": "Español, Inglés, Italiano"
     },
     {
-        "hardSkills": "Elixir, Phoenix, PostgreSQL, OTP",
-        "softSkills": "Resiliencia, Pensamiento distribuido",
+        "hard_skills": "Elixir, Phoenix, PostgreSQL, OTP",
+        "soft_skills": "Resiliencia, Pensamiento distribuido",
         "languages": "Español, Inglés"
     },
     {
-        "hardSkills": "Clojure, Datomic, Ring, Compojure",
-        "softSkills": "Abstracción, Pensamiento funcional",
+        "hard_skills": "Clojure, Datomic, Ring, Compojure",
+        "soft_skills": "Abstracción, Pensamiento funcional",
         "languages": "Español, Inglés, Portugués"
     },
     {
-        "hardSkills": "Haskell, Servant, PostgreSQL, Lens",
-        "softSkills": "Rigor matemático, Pureza funcional",
+        "hard_skills": "Haskell, Servant, PostgreSQL, Lens",
+        "soft_skills": "Rigor matemático, Pureza funcional",
         "languages": "Español, Inglés"
     },
     {
-        "hardSkills": "R, Python, Pandas, TensorFlow",
-        "softSkills": "Análisis de datos, Interpretación",
+        "hard_skills": "R, Python, Pandas, TensorFlow",
+        "soft_skills": "Análisis de datos, Interpretación",
         "languages": "Español, Inglés, Francés"
     },
     {
-        "hardSkills": "Python, PyTorch, CUDA, Deep Learning",
-        "softSkills": "Experimentación, Validación",
+        "hard_skills": "Python, PyTorch, CUDA, Deep Learning",
+        "soft_skills": "Experimentación, Validación",
         "languages": "Español, Inglés"
     },
     {
-        "hardSkills": "SQL, ETL, Airflow, Snowflake",
-        "softSkills": "Organización, Metodología",
+        "hard_skills": "SQL, ETL, Airflow, Snowflake",
+        "soft_skills": "Organización, Metodología",
         "languages": "Español, Inglés, Alemán"
     },
     {
-        "hardSkills": "Tableau, Power BI, DAX, Storytelling",
-        "softSkills": "Comunicación visual, Narrativa",
+        "hard_skills": "Tableau, Power BI, DAX, Storytelling",
+        "soft_skills": "Comunicación visual, Narrativa",
         "languages": "Español, Inglés"
     },
     {
-        "hardSkills": "Figma, Sketch, Adobe XD, Prototyping",
-        "softSkills": "Diseño thinking, Empatía usuario",
+        "hard_skills": "Figma, Sketch, Adobe XD, Prototyping",
+        "soft_skills": "Diseño thinking, Empatía usuario",
         "languages": "Español, Inglés, Italiano"
     },
     {
-        "hardSkills": "Jenkins, GitLab CI, Docker, Kubernetes",
-        "softSkills": "Automatización, Mejora continua",
+        "hard_skills": "Jenkins, GitLab CI, Docker, Kubernetes",
+        "soft_skills": "Automatización, Mejora continua",
         "languages": "Español, Inglés"
     },
     {
-        "hardSkills": "Terraform, AWS, Azure, GCP",
-        "softSkills": "Arquitectura cloud, Escalabilidad",
+        "hard_skills": "Terraform, AWS, Azure, GCP",
+        "soft_skills": "Arquitectura cloud, Escalabilidad",
         "languages": "Español, Inglés, Portugués"
     },
     {
-        "hardSkills": "Linux, Bash, Python, Monitoring",
-        "softSkills": "Troubleshooting, Proactividad",
+        "hard_skills": "Linux, Bash, Python, Monitoring",
+        "soft_skills": "Troubleshooting, Proactividad",
         "languages": "Español, Inglés"
     },
     {
-        "hardSkills": "Scrum, Kanban, Agile, JIRA",
-        "softSkills": "Facilitación, Coaching",
+        "hard_skills": "Scrum, Kanban, Agile, JIRA",
+        "soft_skills": "Facilitación, Coaching",
         "languages": "Español, Inglés, Francés"
     },
     {
-        "hardSkills": "React Native, Expo, Redux, TypeScript",
-        "softSkills": "Movilidad, Experiencia móvil",
+        "hard_skills": "React Native, Expo, Redux, TypeScript",
+        "soft_skills": "Movilidad, Experiencia móvil",
         "languages": "Español, Inglés"
     },
     {
-        "hardSkills": "Unity, C#, AR/VR, Game Physics",
-        "softSkills": "Creatividad, Experiencia inmersiva",
+        "hard_skills": "Unity, C#, AR/VR, Game Physics",
+        "soft_skills": "Creatividad, Experiencia inmersiva",
         "languages": "Español, Inglés, Alemán"
     },
     {
-        "hardSkills": "Solidity, Web3, Ethereum, Smart Contracts",
-        "softSkills": "Descentralización, Seguridad blockchain",
+        "hard_skills": "Solidity, Web3, Ethereum, Smart Contracts",
+        "soft_skills": "Descentralización, Seguridad blockchain",
         "languages": "Español, Inglés"
     },
     {
-        "hardSkills": "MATLAB, Simulink, Control Systems",
-        "softSkills": "Modelado matemático, Simulación",
+        "hard_skills": "MATLAB, Simulink, Control Systems",
+        "soft_skills": "Modelado matemático, Simulación",
         "languages": "Español, Inglés, Italiano"
     },
     {
-        "hardSkills": "SAP ABAP, Fiori, HANA, BW",
-        "softSkills": "Procesos empresariales, ERP",
+        "hard_skills": "SAP ABAP, Fiori, HANA, BW",
+        "soft_skills": "Procesos empresariales, ERP",
         "languages": "Español, Inglés"
     },
     {
-        "hardSkills": "Salesforce, Apex, Lightning, SOQL",
-        "softSkills": "CRM, Automatización ventas",
+        "hard_skills": "Salesforce, Apex, Lightning, SOQL",
+        "soft_skills": "CRM, Automatización ventas",
         "languages": "Español, Inglés, Francés"
     },
     {
-        "hardSkills": "MuleSoft, Anypoint, Integration, APIs",
-        "softSkills": "Conectividad, Arquitectura integración",
+        "hard_skills": "MuleSoft, Anypoint, Integration, APIs",
+        "soft_skills": "Conectividad, Arquitectura integración",
         "languages": "Español, Inglés"
     },
     {
-        "hardSkills": "PowerShell, Active Directory, Windows Server",
-        "softSkills": "Administración sistemas, Automatización",
+        "hard_skills": "PowerShell, Active Directory, Windows Server",
+        "soft_skills": "Administración sistemas, Automatización",
         "languages": "Español, Inglés, Portugués"
     },
     {
-        "hardSkills": "Arduino, Raspberry Pi, IoT, Sensors",
-        "softSkills": "Prototipado, Hardware/Software",
+        "hard_skills": "Arduino, Raspberry Pi, IoT, Sensors",
+        "soft_skills": "Prototipado, Hardware/Software",
         "languages": "Español, Inglés"
     },
     {
-        "hardSkills": "Qt, QML, C++, Embedded Systems",
-        "softSkills": "Interfaces táctiles, UX embedded",
+        "hard_skills": "Qt, QML, C++, Embedded Systems",
+        "soft_skills": "Interfaces táctiles, UX embedded",
         "languages": "Español, Inglés, Alemán"
     },
     {
-        "hardSkills": "Ansible, Puppet, Chef, Infrastructure as Code",
-        "softSkills": "Automatización infraestructura, DevOps",
+        "hard_skills": "Ansible, Puppet, Chef, Infrastructure as Code",
+        "soft_skills": "Automatización infraestructura, DevOps",
         "languages": "Español, Inglés"
     },
     {
-        "hardSkills": "Prometheus, Grafana, ELK Stack, Monitoring",
-        "softSkills": "Observabilidad, Alerting",
+        "hard_skills": "Prometheus, Grafana, ELK Stack, Monitoring",
+        "soft_skills": "Observabilidad, Alerting",
         "languages": "Español, Inglés, Italiano"
     },
     {
-        "hardSkills": "Kafka, RabbitMQ, Event Streaming, Microservices",
-        "softSkills": "Arquitectura orientada a eventos",
+        "hard_skills": "Kafka, RabbitMQ, Event Streaming, Microservices",
+        "soft_skills": "Arquitectura orientada a eventos",
         "languages": "Español, Inglés"
     },
     {
-        "hardSkills": "OpenShift, Istio, Service Mesh, Microservices",
-        "softSkills": "Orquestación contenedores, Escalabilidad",
+        "hard_skills": "OpenShift, Istio, Service Mesh, Microservices",
+        "soft_skills": "Orquestación contenedores, Escalabilidad",
         "languages": "Español, Inglés, Francés"
     },
     {
-        "hardSkills": "React, Redux, TypeScript, Next.js",
-        "softSkills": "Desarrollo frontend moderno",
+        "hard_skills": "React, Redux, TypeScript, Next.js",
+        "soft_skills": "Desarrollo frontend moderno",
         "languages": "Español, Inglés"
     },
     {
-        "hardSkills": "Vue.js, Nuxt.js, Pinia, Composition API",
-        "softSkills": "Reutilización componentes, DX",
+        "hard_skills": "Vue.js, Nuxt.js, Pinia, Composition API",
+        "soft_skills": "Reutilización componentes, DX",
         "languages": "Español, Inglés, Alemán"
     },
     {
-        "hardSkills": "Angular, RxJS, NgRx, Material Design",
-        "softSkills": "Arquitectura enterprise, Testing",
+        "hard_skills": "Angular, RxJS, NgRx, Material Design",
+        "soft_skills": "Arquitectura enterprise, Testing",
         "languages": "Español, Inglés"
     },
     {
-        "hardSkills": "Svelte, SvelteKit, Stores, Transitions",
-        "softSkills": "Performance, Experiencia developer",
+        "hard_skills": "Svelte, SvelteKit, Stores, Transitions",
+        "soft_skills": "Performance, Experiencia developer",
         "languages": "Español, Inglés, Italiano"
     },
     {
-        "hardSkills": "Express.js, NestJS, TypeORM, Swagger",
-        "softSkills": "APIs RESTful, Documentación",
+        "hard_skills": "Express.js, NestJS, TypeORM, Swagger",
+        "soft_skills": "APIs RESTful, Documentación",
         "languages": "Español, Inglés"
     },
     {
-        "hardSkills": "Django REST, DRF, Celery, Redis",
-        "softSkills": "Backend robusto, Tareas asíncronas",
+        "hard_skills": "Django REST, DRF, Celery, Redis",
+        "soft_skills": "Backend robusto, Tareas asíncronas",
         "languages": "Español, Inglés, Francés"
     },
     {
-        "hardSkills": "Flask, SQLAlchemy, Marshmallow, JWT",
-        "softSkills": "Microframeworks, Flexibilidad",
+        "hard_skills": "Flask, SQLAlchemy, Marshmallow, JWT",
+        "soft_skills": "Microframeworks, Flexibilidad",
         "languages": "Español, Inglés"
     },
     {
-        "hardSkills": "Spring Boot, JPA, Hibernate, Security",
-        "softSkills": "Enterprise Java, Persistencia",
+        "hard_skills": "Spring Boot, JPA, Hibernate, Security",
+        "soft_skills": "Enterprise Java, Persistencia",
         "languages": "Español, Inglés, Portugués"
     },
     {
-        "hardSkills": ".NET Core, Entity Framework, Identity, SignalR",
-        "softSkills": "Plataforma Microsoft, Tiempo real",
+        "hard_skills": ".NET Core, Entity Framework, Identity, SignalR",
+        "soft_skills": "Plataforma Microsoft, Tiempo real",
         "languages": "Español, Inglés"
     },
     {
-        "hardSkills": "Laravel, Livewire, Alpine.js, MySQL",
-        "softSkills": "Fullstack PHP, SPA sin JS complejo",
+        "hard_skills": "Laravel, Livewire, Alpine.js, MySQL",
+        "soft_skills": "Fullstack PHP, SPA sin JS complejo",
         "languages": "Español, Inglés, Alemán"
     },
     {
-        "hardSkills": "Symfony, Doctrine, Twig, API Platform",
-        "softSkills": "Arquitectura PHP enterprise",
+        "hard_skills": "Symfony, Doctrine, Twig, API Platform",
+        "soft_skills": "Arquitectura PHP enterprise",
         "languages": "Español, Inglés"
     },
     {
-        "hardSkills": "Ruby on Rails, Hotwire, PostgreSQL, Sidekiq",
-        "softSkills": "Conventions over configuration",
+        "hard_skills": "Ruby on Rails, Hotwire, PostgreSQL, Sidekiq",
+        "soft_skills": "Conventions over configuration",
         "languages": "Español, Inglés, Italiano"
     },
     {
-        "hardSkills": "Phoenix, Elixir, Ecto, LiveView",
-        "softSkills": "Concurrencia, Tiempo real",
+        "hard_skills": "Phoenix, Elixir, Ecto, LiveView",
+        "soft_skills": "Concurrencia, Tiempo real",
         "languages": "Español, Inglés"
     },
     {
-        "hardSkills": "Django, Wagtail CMS, PostgreSQL, Elasticsearch",
-        "softSkills": "CMS moderno, Búsqueda avanzada",
+        "hard_skills": "Django, Wagtail CMS, PostgreSQL, Elasticsearch",
+        "soft_skills": "CMS moderno, Búsqueda avanzada",
         "languages": "Español, Inglés, Francés"
     },
     {
-        "hardSkills": "Strapi, Headless CMS, GraphQL, Admin Panel",
-        "softSkills": "Content management, API-first",
+        "hard_skills": "Strapi, Headless CMS, GraphQL, Admin Panel",
+        "soft_skills": "Content management, API-first",
         "languages": "Español, Inglés"
     },
     {
-        "hardSkills": "WordPress, WooCommerce, PHP, MySQL",
-        "softSkills": "E-commerce, Plugins ecosystem",
+        "hard_skills": "WordPress, WooCommerce, PHP, MySQL",
+        "soft_skills": "E-commerce, Plugins ecosystem",
         "languages": "Español, Inglés, Portugués"
     },
     {
-        "hardSkills": "Shopify, Liquid, JavaScript, Apps",
-        "softSkills": "E-commerce SaaS, Customización",
+        "hard_skills": "Shopify, Liquid, JavaScript, Apps",
+        "soft_skills": "E-commerce SaaS, Customización",
         "languages": "Español, Inglés"
     },
     {
-        "hardSkills": "Magento, PHP, MySQL, Elasticsearch",
-        "softSkills": "E-commerce enterprise, Escalabilidad",
+        "hard_skills": "Magento, PHP, MySQL, Elasticsearch",
+        "soft_skills": "E-commerce enterprise, Escalabilidad",
         "languages": "Español, Inglés, Alemán"
     },
     {
-        "hardSkills": "PrestaShop, PHP, Smarty, Modules",
-        "softSkills": "E-commerce open source",
+        "hard_skills": "PrestaShop, PHP, Smarty, Modules",
+        "soft_skills": "E-commerce open source",
         "languages": "Español, Inglés"
     },
     {
-        "hardSkills": "Odoo, Python, PostgreSQL, XML",
-        "softSkills": "ERP open source, Modularidad",
+        "hard_skills": "Odoo, Python, PostgreSQL, XML",
+        "soft_skills": "ERP open source, Modularidad",
         "languages": "Español, Inglés, Francés"
     },
     {
-        "hardSkills": "SuiteCRM, PHP, MySQL, SugarCRM",
-        "softSkills": "CRM open source, Personalización",
+        "hard_skills": "SuiteCRM, PHP, MySQL, SugarCRM",
+        "soft_skills": "CRM open source, Personalización",
         "languages": "Español, Inglés"
     },
     {
-        "hardSkills": "Moodle, PHP, MySQL, SCORM",
-        "softSkills": "E-learning, LMS",
+        "hard_skills": "Moodle, PHP, MySQL, SCORM",
+        "soft_skills": "E-learning, LMS",
         "languages": "Español, Inglés, Italiano"
     },
     {
-        "hardSkills": "Canvas LMS, Ruby, PostgreSQL, LTI",
-        "softSkills": "E-learning enterprise",
+        "hard_skills": "Canvas LMS, Ruby, PostgreSQL, LTI",
+        "soft_skills": "E-learning enterprise",
         "languages": "Español, Inglés"
     },
     {
-        "hardSkills": "Google Cloud, Firebase, BigQuery, ML Engine",
-        "softSkills": "Cloud computing, Machine Learning",
+        "hard_skills": "Google Cloud, Firebase, BigQuery, ML Engine",
+        "soft_skills": "Cloud computing, Machine Learning",
         "languages": "Español, Inglés, Portugués"
     },
     {
-        "hardSkills": "AWS Lambda, S3, DynamoDB, CloudFormation",
-        "softSkills": "Serverless, Infraestructura como código",
+        "hard_skills": "AWS Lambda, S3, DynamoDB, CloudFormation",
+        "soft_skills": "Serverless, Infraestructura como código",
         "languages": "Español, Inglés"
     },
     {
-        "hardSkills": "Azure Functions, Blob Storage, Cosmos DB, ARM",
-        "softSkills": "Cloud Microsoft, Enterprise",
+        "hard_skills": "Azure Functions, Blob Storage, Cosmos DB, ARM",
+        "soft_skills": "Cloud Microsoft, Enterprise",
         "languages": "Español, Inglés, Alemán"
     },
     {
-        "hardSkills": "Docker, Kubernetes, Helm, Istio",
-        "softSkills": "Contenedorización, Orquestación",
+        "hard_skills": "Docker, Kubernetes, Helm, Istio",
+        "soft_skills": "Contenedorización, Orquestación",
         "languages": "Español, Inglés"
     },
     {
-        "hardSkills": "Terraform, Ansible, Packer, Vault",
-        "softSkills": "Infrastructure as Code, DevOps",
+        "hard_skills": "Terraform, Ansible, Packer, Vault",
+        "soft_skills": "Infrastructure as Code, DevOps",
         "languages": "Español, Inglés, Francés"
     },
     {
-        "hardSkills": "Jenkins, GitLab CI, GitHub Actions, ArgoCD",
-        "softSkills": "CI/CD, Automatización despliegues",
+        "hard_skills": "Jenkins, GitLab CI, GitHub Actions, ArgoCD",
+        "soft_skills": "CI/CD, Automatización despliegues",
         "languages": "Español, Inglés"
     },
     {
-        "hardSkills": "PostgreSQL, MongoDB, Redis, Elasticsearch",
-        "softSkills": "Bases de datos, Búsqueda, Cache",
+        "hard_skills": "PostgreSQL, MongoDB, Redis, Elasticsearch",
+        "soft_skills": "Bases de datos, Búsqueda, Cache",
         "languages": "Español, Inglés, Italiano"
     },
     {
-        "hardSkills": "MySQL, MariaDB, Percona, Galera",
-        "softSkills": "Bases de datos relacionales, Alta disponibilidad",
+        "hard_skills": "MySQL, MariaDB, Percona, Galera",
+        "soft_skills": "Bases de datos relacionales, Alta disponibilidad",
         "languages": "Español, Inglés"
     },
     {
-        "hardSkills": "Oracle, SQL Server, DB2, PL/SQL",
-        "softSkills": "Bases de datos enterprise",
+        "hard_skills": "Oracle, SQL Server, DB2, PL/SQL",
+        "soft_skills": "Bases de datos enterprise",
         "languages": "Español, Inglés, Portugués"
     },
     {
-        "hardSkills": "SQLite, LevelDB, RocksDB, Time Series",
-        "softSkills": "Bases de datos embebidas, Series temporales",
+        "hard_skills": "SQLite, LevelDB, RocksDB, Time Series",
+        "soft_skills": "Bases de datos embebidas, Series temporales",
         "languages": "Español, Inglés"
     },
     {
-        "hardSkills": "Prometheus, Grafana, Loki, Tempo",
-        "softSkills": "Observabilidad, Métricas, Logs, Trazas",
+        "hard_skills": "Prometheus, Grafana, Loki, Tempo",
+        "soft_skills": "Observabilidad, Métricas, Logs, Trazas",
         "languages": "Español, Inglés, Alemán"
     },
     {
-        "hardSkills": "ELK Stack, Fluentd, Kafka, ClickHouse",
-        "softSkills": "Big Data, Análisis de logs",
+        "hard_skills": "ELK Stack, Fluentd, Kafka, ClickHouse",
+        "soft_skills": "Big Data, Análisis de logs",
         "languages": "Español, Inglés"
     },
     {
-        "hardSkills": "Apache Spark, Hadoop, Hive, Presto",
-        "softSkills": "Big Data processing, Data lakes",
+        "hard_skills": "Apache Spark, Hadoop, Hive, Presto",
+        "soft_skills": "Big Data processing, Data lakes",
         "languages": "Español, Inglés, Francés"
     },
     {
-        "hardSkills": "Airflow, Prefect, Dagster, DBT",
-        "softSkills": "Data pipelines, Orchestration",
+        "hard_skills": "Airflow, Prefect, Dagster, DBT",
+        "soft_skills": "Data pipelines, Orchestration",
         "languages": "Español, Inglés"
     },
     {
-        "hardSkills": "Pandas, NumPy, Scikit-learn, Jupyter",
-        "softSkills": "Data Science, Machine Learning",
+        "hard_skills": "Pandas, NumPy, Scikit-learn, Jupyter",
+        "soft_skills": "Data Science, Machine Learning",
         "languages": "Español, Inglés, Italiano"
     },
     {
-        "hardSkills": "TensorFlow, PyTorch, Keras, OpenCV",
-        "softSkills": "Deep Learning, Computer Vision",
+        "hard_skills": "TensorFlow, PyTorch, Keras, OpenCV",
+        "soft_skills": "Deep Learning, Computer Vision",
         "languages": "Español, Inglés"
     },
     {
-        "hardSkills": "NLP, spaCy, Transformers, BERT",
-        "softSkills": "Procesamiento de lenguaje natural",
+        "hard_skills": "NLP, spaCy, Transformers, BERT",
+        "soft_skills": "Procesamiento de lenguaje natural",
         "languages": "Español, Inglés, Portugués"
     },
     {
-        "hardSkills": "Tableau, Power BI, Looker, Metabase",
-        "softSkills": "Business Intelligence, Visualización",
+        "hard_skills": "Tableau, Power BI, Looker, Metabase",
+        "soft_skills": "Business Intelligence, Visualización",
         "languages": "Español, Inglés"
     },
     {
-        "hardSkills": "Figma, Adobe XD, Sketch, InVision",
-        "softSkills": "UI/UX Design, Prototipado",
+        "hard_skills": "Figma, Adobe XD, Sketch, InVision",
+        "soft_skills": "UI/UX Design, Prototipado",
         "languages": "Español, Inglés, Alemán"
     },
     {
-        "hardSkills": "Photoshop, Illustrator, After Effects, Premiere",
-        "softSkills": "Diseño gráfico, Motion graphics",
+        "hard_skills": "Photoshop, Illustrator, After Effects, Premiere",
+        "soft_skills": "Diseño gráfico, Motion graphics",
         "languages": "Español, Inglés"
     },
     {
-        "hardSkills": "Blender, Maya, 3ds Max, ZBrush",
-        "softSkills": "Modelado 3D, Animación",
+        "hard_skills": "Blender, Maya, 3ds Max, ZBrush",
+        "soft_skills": "Modelado 3D, Animación",
         "languages": "Español, Inglés, Italiano"
     },
     {
-        "hardSkills": "Unity, Unreal Engine, Godot, Game Design",
-        "softSkills": "Desarrollo de videojuegos",
+        "hard_skills": "Unity, Unreal Engine, Godot, Game Design",
+        "soft_skills": "Desarrollo de videojuegos",
         "languages": "Español, Inglés"
     },
     {
-        "hardSkills": "Arduino, Raspberry Pi, ESP32, IoT",
-        "softSkills": "Prototipado hardware, Electrónica",
+        "hard_skills": "Arduino, Raspberry Pi, ESP32, IoT",
+        "soft_skills": "Prototipado hardware, Electrónica",
         "languages": "Español, Inglés, Francés"
     },
     {
-        "hardSkills": "MATLAB, Simulink, LabVIEW, Control Systems",
-        "softSkills": "Sistemas de control, Automatización industrial",
+        "hard_skills": "MATLAB, Simulink, LabVIEW, Control Systems",
+        "soft_skills": "Sistemas de control, Automatización industrial",
         "languages": "Español, Inglés"
     },
     {
-        "hardSkills": "SolidWorks, AutoCAD, CATIA, Mechanical Design",
-        "softSkills": "Diseño mecánico, CAD",
+        "hard_skills": "SolidWorks, AutoCAD, CATIA, Mechanical Design",
+        "soft_skills": "Diseño mecánico, CAD",
         "languages": "Español, Inglés, Alemán"
     },
     {
-        "hardSkills": "ANSYS, COMSOL, CFD, FEA",
-        "softSkills": "Simulación ingenieril, Análisis numérico",
+        "hard_skills": "ANSYS, COMSOL, CFD, FEA",
+        "soft_skills": "Simulación ingenieril, Análisis numérico",
         "languages": "Español, Inglés"
     },
     {
-        "hardSkills": "PLC Programming, SCADA, Industrial Networks",
-        "softSkills": "Automatización industrial, Control de procesos",
+        "hard_skills": "PLC Programming, SCADA, Industrial Networks",
+        "soft_skills": "Automatización industrial, Control de procesos",
         "languages": "Español, Inglés, Italiano"
     },
     {
-        "hardSkills": "Embedded C, RTOS, ARM, Microcontrollers",
-        "softSkills": "Sistemas embebidos, Programación de bajo nivel",
+        "hard_skills": "Embedded C, RTOS, ARM, Microcontrollers",
+        "soft_skills": "Sistemas embebidos, Programación de bajo nivel",
         "languages": "Español, Inglés"
     },
     {
-        "hardSkills": "VHDL, Verilog, FPGA, ASIC Design",
-        "softSkills": "Diseño digital, Lógica programable",
+        "hard_skills": "VHDL, Verilog, FPGA, ASIC Design",
+        "soft_skills": "Diseño digital, Lógica programable",
         "languages": "Español, Inglés, Portugués"
     },
     {
-        "hardSkills": "ROS, Gazebo, Navigation, Computer Vision",
-        "softSkills": "Robótica, Sistemas autónomos",
+        "hard_skills": "ROS, Gazebo, Navigation, Computer Vision",
+        "soft_skills": "Robótica, Sistemas autónomos",
         "languages": "Español, Inglés"
     },
     {
-        "hardSkills": "Blockchain, Solidity, Web3.js, DeFi",
-        "softSkills": "Tecnología descentralizada, Criptoeconomía",
+        "hard_skills": "Blockchain, Solidity, Web3.js, DeFi",
+        "soft_skills": "Tecnología descentralizada, Criptoeconomía",
         "languages": "Español, Inglés, Francés"
     },
     {
-        "hardSkills": "Quantum Computing, Qiskit, Cirq, Q#",
-        "softSkills": "Computación cuántica, Algoritmos cuánticos",
+        "hard_skills": "Quantum Computing, Qiskit, Cirq, Q#",
+        "soft_skills": "Computación cuántica, Algoritmos cuánticos",
         "languages": "Español, Inglés"
     },
     {
-        "hardSkills": "Bioinformatics, R, Python, Genomics",
-        "softSkills": "Análisis biológico, Secuenciación",
+        "hard_skills": "Bioinformatics, R, Python, Genomics",
+        "soft_skills": "Análisis biológico, Secuenciación",
         "languages": "Español, Inglés, Alemán"
     },
     {
-        "hardSkills": "GIS, ArcGIS, QGIS, GeoServer",
-        "softSkills": "Sistemas de información geográfica",
+        "hard_skills": "GIS, ArcGIS, QGIS, GeoServer",
+        "soft_skills": "Sistemas de información geográfica",
         "languages": "Español, Inglés"
     },
     {
-        "hardSkills": "Cybersecurity, Ethical Hacking, SIEM, SOC",
-        "softSkills": "Seguridad informática, Análisis de amenazas",
+        "hard_skills": "Cybersecurity, Ethical Hacking, SIEM, SOC",
+        "soft_skills": "Seguridad informática, Análisis de amenazas",
         "languages": "Español, Inglés, Italiano"
     },
     {
-        "hardSkills": "Cryptography, PKI, SSL/TLS, Zero Trust",
-        "softSkills": "Criptografía, Seguridad de comunicaciones",
+        "hard_skills": "Cryptography, PKI, SSL/TLS, Zero Trust",
+        "soft_skills": "Criptografía, Seguridad de comunicaciones",
         "languages": "Español, Inglés"
     },
     {
-        "hardSkills": "Penetration Testing, OWASP, Burp Suite, Metasploit",
-        "softSkills": "Testing de seguridad, Ethical hacking",
+        "hard_skills": "Penetration Testing, OWASP, Burp Suite, Metasploit",
+        "soft_skills": "Testing de seguridad, Ethical hacking",
         "languages": "Español, Inglés, Portugués"
     },
     {
-        "hardSkills": "Compliance, GDPR, ISO 27001, Risk Assessment",
-        "softSkills": "Cumplimiento normativo, Gestión de riesgos",
+        "hard_skills": "Compliance, GDPR, ISO 27001, Risk Assessment",
+        "soft_skills": "Cumplimiento normativo, Gestión de riesgos",
         "languages": "Español, Inglés"
     },
     {
-        "hardSkills": "Digital Forensics, Memory Analysis, Malware Analysis",
-        "softSkills": "Investigación digital, Análisis forense",
+        "hard_skills": "Digital Forensics, Memory Analysis, Malware Analysis",
+        "soft_skills": "Investigación digital, Análisis forense",
         "languages": "Español, Inglés, Francés"
     },
     {
-        "hardSkills": "Agile, Scrum, Kanban, XP, Lean",
-        "softSkills": "Metodologías ágiles, Gestión de proyectos",
+        "hard_skills": "Agile, Scrum, Kanban, XP, Lean",
+        "soft_skills": "Metodologías ágiles, Gestión de proyectos",
         "languages": "Español, Inglés"
     },
     {
-        "hardSkills": "Product Management, Roadmap, User Stories, A/B Testing",
-        "softSkills": "Gestión de producto, Validación de hipótesis",
+        "hard_skills": "Product Management, Roadmap, User Stories, A/B Testing",
+        "soft_skills": "Gestión de producto, Validación de hipótesis",
         "languages": "Español, Inglés, Alemán"
     },
     {
-        "hardSkills": "UX Research, User Testing, Usability, Accessibility",
-        "softSkills": "Investigación de usuario, Diseño centrado en humano",
+        "hard_skills": "UX Research, User Testing, Usability, Accessibility",
+        "soft_skills": "Investigación de usuario, Diseño centrado en humano",
         "languages": "Español, Inglés"
     },
     {
-        "hardSkills": "Growth Hacking, Analytics, SEO, SEM",
-        "softSkills": "Crecimiento de producto, Marketing digital",
+        "hard_skills": "Growth Hacking, Analytics, SEO, SEM",
+        "soft_skills": "Crecimiento de producto, Marketing digital",
         "languages": "Español, Inglés, Italiano"
     },
     {
-        "hardSkills": "Technical Writing, Documentation, API Docs, MkDocs",
-        "softSkills": "Comunicación técnica, Documentación",
+        "hard_skills": "Technical Writing, Documentation, API Docs, MkDocs",
+        "soft_skills": "Comunicación técnica, Documentación",
         "languages": "Español, Inglés"
     },
     {
-        "hardSkills": "Teaching, Mentoring, Curriculum Design, Online Learning",
-        "softSkills": "Educación, Desarrollo profesional",
+        "hard_skills": "Teaching, Mentoring, Curriculum Design, Online Learning",
+        "soft_skills": "Educación, Desarrollo profesional",
         "languages": "Español, Inglés, Portugués"
     }
 ]
@@ -932,7 +932,7 @@ ASSIGNMENTS_DATA = generate_random_assignments(150)  # 150 asignaciones aleatori
 # ============================================
 
 if __name__ == "__main__":
-    print("📊 DATOS DE PRUEBA GENERADOS:")
+    print("[DATA] DATOS DE PRUEBA GENERADOS:")
     print(f"   • {len(PROFILES_DATA)} perfiles")
     print(f"   • {len(EMPLOYEES_DATA)} empleados")
     print(f"   • {len(PROJECTS_DATA)} proyectos")

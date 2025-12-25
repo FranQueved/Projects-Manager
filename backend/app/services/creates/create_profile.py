@@ -1,53 +1,44 @@
-# app/services/create_profile.py
+"""Profile creation service - Create professional profiles."""
 
+from typing import List
 from app.schemas.profile import ProfileCreate
 from app.models.profile import Profile
 from app.db.database import SessionLocal
 
+
 class ProfileCreator:
-    """
-    Clase que permite crear uno o varios perfiles a partir de JSONs.
-    """
+    """Service for creating professional profiles."""
 
     def __init__(self):
         self.db = SessionLocal()
 
-    def create_one(self, json_data: dict) -> Profile:
-        """
-        Crea un único perfil a partir de un JSON.
-        """
-        # 1. Validar JSON → Schema
-        schema = ProfileCreate(**json_data)
-
-        # 2. Schema → Modelo SQLAlchemy
+    def create_one(self, data: dict) -> Profile:
+        """Create single profile."""
+        schema = ProfileCreate(**data)
         profile = Profile(**schema.dict())
-
-        # 3. Guardar en BD
         self.db.add(profile)
         self.db.commit()
         self.db.refresh(profile)
-
         return profile
 
-    def create_many(self, json_list: list[dict]) -> list[Profile]:
-        """
-        Crea múltiples perfiles a partir de una lista de JSONs.
-        """
-        created_profiles = []
-
-        for json_data in json_list:
-            # 1. Validar JSON → Schema
-            schema = ProfileCreate(**json_data)
-
-            # 2. Schema → Modelo SQLAlchemy
+    def create_many(self, data_list: List[dict]) -> List[Profile]:
+        """Create multiple profiles."""
+        created = []
+        for data in data_list:
+            schema = ProfileCreate(**data)
             profile = Profile(**schema.dict())
-
-            # 3. Añadir a la sesión
             self.db.add(profile)
-            created_profiles.append(profile)
+            created.append(profile)
 
-        # Commit único para optimizar rendimiento
         self.db.commit()
+        for profile in created:
+            self.db.refresh(profile)
+
+        return created
+
+    def close(self):
+        """Close database session."""
+        self.db.close()
 
         # Refrescar para obtener IDs
         for profile in created_profiles:

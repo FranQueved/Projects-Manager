@@ -1,118 +1,170 @@
-# app/services/employee_service.py
+"""Employee service - CRUD operations for employees."""
 
 from typing import List, Optional
 from sqlalchemy.orm import Session
 from app.db.database import SessionLocal
-from app.schemas.employee import EmployeeCreate, EmployeeUpdate, EmployeeRead
-from app.models.epmloyees import Employee
+from app.schemas.employee import EmployeeCreate, EmployeeUpdate
+from app.models.employee import Employee
 from app.models.profile import Profile
+from app.services.vectorial_services.embedding_service import EmbeddingService
+
 
 class EmployeeService:
-    """
-    Servicio completo para operaciones CRUD de empleados.
-    """
+    """Employee CRUD service."""
 
     def __init__(self):
         self.db: Session = SessionLocal()
+        self.embedding_service = EmbeddingService()
 
-    # CREATE
-    def create_one(self, json_data: dict) -> Employee:
-        """Crea un único empleado."""
-        schema = EmployeeCreate(**json_data)
-        employee = Employee(**schema.dict())
+    def create_one(self, data: dict) -> Employee:
+        """Create single employee with auto profile creation and embedding generation."""
+        schema = EmployeeCreate(**data)
+        
+        # If profile_id is provided, use existing profile
+        if schema.profile_id:
+            profile = self.db.query(Profile).filter(Profile.id == schema.profile_id).first()
+            if not profile:
+                raise ValueError(f"Profile {schema.profile_id} does not exist")
+            
+            existing = self.db.query(Employee).filter(Employee.profile_id == schema.profile_id).first()
+            if existing:
+                raise ValueError(f"Profile {schema.profile_id} already assigned to employee {existing.id}")
+        # Otherwise, create new profile from provided data
+        elif schema.hard_skills or schema.soft_skills or schema.languages:
+            profile = Profile(
+                hard_skills=schema.hard_skills or "",
+                soft_skills=schema.soft_skills or "",
+                languages=schema.languages or ""
+            )
+            self.db.add(profile)
+            self.db.flush()
+        else:
+            raise ValueError("Either profile_id or profile data (hard_skills, soft_skills, languages) must be provided")
+        
+        # Create employee with profile
+        employee_data = {
+            "name": schema.name,
+            "office": schema.office,
+            "profile_id": profile.id
+        }
+        employee = Employee(**employee_data)
         self.db.add(employee)
         self.db.commit()
         self.db.refresh(employee)
+        
+        self.embedding_service.create_embedding_for_employee(employee.id)
+        
         return employee
 
-    def create_many(self, json_list: List[dict]) -> List[Employee]:
-        """Crea múltiples empleados."""
-        created_employees = []
-        for json_data in json_list:
-            schema = EmployeeCreate(**json_data)
-            employee = Employee(**schema.dict())
+    def create_many(self, data_list: List[dict]) -> List[Employee]:
+        """Create multiple employees with auto profile creation and embedding generation."""
+        created = []
+        for data in data_list:
+            schema = EmployeeCreate(**data)
+            
+            # If profile_id is provided, use existing profile
+            if schema.profile_id:
+                profile = self.db.query(Profile).filter(Profile.id == schema.profile_id).first()
+                if not profile:
+                    raise ValueError(f"Profile {schema.profile_id} does not exist")
+                
+                existing = self.db.query(Employee).filter(Employee.profile_id == schema.profile_id).first()
+                if existing:
+                    raise ValueError(f"Profile {schema.profile_id} already assigned to employee {existing.id}")
+            # Otherwise, create new profile from provided data
+            elif schema.hard_skills or schema.soft_skills or schema.languages:
+                profile = Profile(
+                    hard_skills=schema.hard_skills or "",
+                    soft_skills=schema.soft_skills or "",
+                    languages=schema.languages or ""
+                )
+                self.db.add(profile)
+                self.db.flush()
+            else:
+                raise ValueError("Either profile_id or profile data (hard_skills, soft_skills, languages) must be provided")
+            
+            # Create employee with profile
+            employee_data = {
+                "name": schema.name,
+                "office": schema.office,
+                "profile_id": profile.id
+            }
+            employee = Employee(**employee_data)
             self.db.add(employee)
-            created_employees.append(employee)
+            created.append(employee)
+        
         self.db.commit()
-        for employee in created_employees:
+        for employee in created:
             self.db.refresh(employee)
-        return created_employees
+            self.embedding_service.create_embedding_for_employee(employee.id)
+        return created
 
-    # READ
     def get_by_id(self, employee_id: int) -> Optional[Employee]:
-        """Obtiene un empleado por ID."""
+        """Get employee by ID."""
         return self.db.query(Employee).filter(Employee.id == employee_id).first()
 
     def get_all(self) -> List[Employee]:
-        """Obtiene todos los empleados."""
+        """Get all employees."""
         return self.db.query(Employee).all()
 
     def get_by_office(self, office: str) -> List[Employee]:
-        """Obtiene empleados por oficina."""
+        """Get employees by office."""
         return self.db.query(Employee).filter(Employee.office == office).all()
 
     def get_by_name(self, name: str) -> List[Employee]:
-        """Obtiene empleados por nombre (búsqueda parcial)."""
+        """Get employees by name (partial search)."""
         return self.db.query(Employee).filter(Employee.name.ilike(f"%{name}%")).all()
 
     def get_with_profile(self, employee_id: int) -> Optional[Employee]:
-        """Obtiene un empleado con su perfil cargado."""
+        """Get employee with loaded profile."""
         return self.db.query(Employee).filter(Employee.id == employee_id).first()
 
     def get_profile_of_employee(self, employee_id: int) -> Optional[Profile]:
-        """Obtiene el perfil asociado a un empleado."""
+        """Get profile associated with employee."""
         employee = self.get_by_id(employee_id)
         if employee:
             return employee.profile
         return None
-    # UPDATE
-    def update_by_id(self, employee_id: int, json_data: dict) -> Optional[Employee]:
-        """Actualiza un empleado por ID."""
+
+    def close(self):
+        """Close database session and embedding service."""
+        self.db.close()
+        self.embedding_service.close()
+
+    def update_by_id(self, employee_id: int, data: dict) -> Optional[Employee]:
+        """Update employee."""
         employee = self.get_by_id(employee_id)
         if not employee:
             return None
 
-        schema = EmployeeUpdate(**json_data)
+        schema = EmployeeUpdate(**data)
         update_data = schema.dict(exclude_unset=True)
 
-        for field, value in update_data.items():
-            setattr(employee, field, value)
+        if "profile_id" in update_data:
+            new_profile_id = update_data["profile_id"]
+            profile = self.db.query(Profile).filter(Profile.id == new_profile_id).first()
+            if not profile:
+                raise ValueError(f"Profile {new_profile_id} does not exist")
 
+            existing = self.db.query(Employee).filter(Employee.profile_id == new_profile_id).first()
+            if existing and existing.id != employee_id:
+                raise ValueError(f"Profile {new_profile_id} already assigned to another employee")
+
+        for key, value in update_data.items():
+            setattr(employee, key, value)
         self.db.commit()
         self.db.refresh(employee)
         return employee
 
-    # DELETE
     def delete_by_id(self, employee_id: int) -> bool:
-        """Elimina un empleado por ID."""
+        """Delete employee."""
         employee = self.get_by_id(employee_id)
-        if not employee:
-            return False
-
-        self.db.delete(employee)
-        self.db.commit()
-        return True
-
-    def delete_many(self, employee_ids: List[int]) -> int:
-        """Elimina múltiples empleados por IDs. Retorna cantidad eliminada."""
-        deleted_count = self.db.query(Employee).filter(Employee.id.in_(employee_ids)).delete()
-        self.db.commit()
-        return deleted_count
-
-    def assign_profile_to_employee(self, employee_id: int, profile_id: int) -> bool:
-        """Asigna un perfil a un empleado (relación 1 a 1)."""
-        employee = self.get_by_id(employee_id)
-        if not employee:
-            return False
-
-        profile = self.db.query(Profile).filter(Profile.id == profile_id).first()
-        if not profile:
-            return False
-
-        employee.profile_id = profile_id
-        self.db.commit()
-        return True
+        if employee:
+            self.db.delete(employee)
+            self.db.commit()
+            return True
+        return False
 
     def close(self):
-        """Cierra la sesión de base de datos."""
+        """Close database session."""
         self.db.close()

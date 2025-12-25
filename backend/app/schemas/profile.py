@@ -1,27 +1,31 @@
-# app/schemas/profile.py
+"""Profile request/response schemas."""
 
 from pydantic import BaseModel
 from typing import Optional
 
-# Base: campos comunes entre entrada y salida
+
 class ProfileBase(BaseModel):
-    hardSkills: str
-    softSkills: str
+    """Base profile schema."""
+    hard_skills: str
+    soft_skills: str
     languages: str
 
-# Schema para crear un perfil (lo que envía el frontend)
+
 class ProfileCreate(ProfileBase):
+    """Schema for creating profile."""
     pass
 
-# Schema para leer un perfil (lo que devuelves al frontend)
+
 class ProfileRead(ProfileBase):
+    """Schema for reading profile."""
     id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
-# Schema para actualizar un perfil
+
 class ProfileUpdate(BaseModel):
-    hardSkills: Optional[str] = None
-    softSkills: Optional[str] = None
+    """Schema for updating profile."""
+    hard_skills: Optional[str] = None
+    soft_skills: Optional[str] = None
     languages: Optional[str] = None
