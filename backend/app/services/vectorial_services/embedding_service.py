@@ -6,7 +6,6 @@ from sqlalchemy.orm import Session
 from app.db.database import SessionLocal
 from app.services.vectorial_services.embeding_creator import string_a_embedding
 from app.services.service_layer.profile_service import ProfileService
-from app.services.service_layer.employee_service import EmployeeService
 from app.models.required_profile import RequiredProfile
 import numpy as np
 
@@ -17,7 +16,14 @@ class EmbeddingService:
     def __init__(self):
         self.db: Session = SessionLocal()
         self.profile_service = ProfileService()
-        self.employee_service = EmployeeService()
+        self.employee_service = None
+
+    def _get_employee_service(self):
+        """Lazily initialize employee service to avoid circular imports."""
+        if self.employee_service is None:
+            from app.services.service_layer.employee_service import EmployeeService
+            self.employee_service = EmployeeService()
+        return self.employee_service
 
     def generate_embedding(self, text: str) -> Optional[List[float]]:
         """Generate 384-dimensional embedding from text."""
@@ -31,7 +37,7 @@ class EmbeddingService:
     def create_embedding_for_employee(self, employee_id: int) -> bool:
         """Create embedding for employee profile and store in pgvector."""
         try:
-            employee = self.employee_service.get_by_id(employee_id)
+            employee = self._get_employee_service().get_by_id(employee_id)
             if not employee or not employee.profile:
                 print(f"   Employee or profile not found: {employee_id}")
                 return False

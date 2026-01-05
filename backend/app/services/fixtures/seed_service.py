@@ -73,7 +73,9 @@ class SeedService:
             stats["required_profiles"] = self._create_required_profiles()
             print(f"   [OK] Required profiles assigned")
 
-            print(f"\n[NOTICE] All embeddings generated automatically during creation")
+            print(f"\n[6/6] Generating embeddings for all employees and required profiles...")
+            stats["embeddings"] = self._create_embeddings()
+            print(f"   [OK] {stats['embeddings']} embeddings generated")
 
             elapsed_time = time.time() - start_time
 
@@ -87,7 +89,7 @@ class SeedService:
             print(f"   • Projects: {stats['projects']}")
             print(f"   • Assignments: {stats['assignments']}")
             print(f"   • Required profiles: {stats.get('required_profiles', 0)}")
-            print("   • Embeddings: Generated automatically during creation")
+            print(f"   • Embeddings: {stats.get('embeddings', 0)}")
             print("=" * 70 + "\n")
 
             stats["success"] = True
@@ -173,8 +175,41 @@ class SeedService:
         return created_count
 
     def _create_embeddings(self):
-        """Embeddings generated automatically during employee creation."""
-        return 0
+        """Generate embeddings for all employees and required profiles."""
+        from app.services.vectorial_services.embedding_service import EmbeddingService
+        
+        embedding_service = EmbeddingService()
+        created_count = 0
+        
+        try:
+            # Generate embeddings for all employees
+            all_employees = self.employee_service.get_all()
+            print(f"\n   Generating embeddings for {len(all_employees)} employees...")
+            
+            for i, employee in enumerate(all_employees, 1):
+                if embedding_service.create_embedding_for_employee(employee.id):
+                    created_count += 1
+                if i % 10 == 0:
+                    print(f"   [OK] Employee embeddings: {i}/{len(all_employees)}")
+            
+            # Generate embeddings for all required profiles
+            all_required_profiles = self.required_profile_service.get_all()
+            print(f"\n   Generating embeddings for {len(all_required_profiles)} required profiles...")
+            
+            for i, req_profile in enumerate(all_required_profiles, 1):
+                if embedding_service.create_embedding_for_required_profile(req_profile.id):
+                    created_count += 1
+                if i % 10 == 0:
+                    print(f"   [OK] Required profile embeddings: {i}/{len(all_required_profiles)}")
+            
+            return created_count
+        except Exception as e:
+            print(f"   [ERROR] Creating embeddings: {e}")
+            import traceback
+            traceback.print_exc()
+            return created_count
+        finally:
+            embedding_service.close()
 
     def _create_required_profiles(self):
         """Assign required profiles to each project (1-4 per project)."""
