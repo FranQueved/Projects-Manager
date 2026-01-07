@@ -7,7 +7,9 @@ from sqlalchemy.orm import Session
 from app.db.database import get_db
 from app.models.employee import Employee
 from app.models.profile import Profile
+from app.models.embedding import Embedding
 from app.schemas.employee import EmployeeCreate, EmployeeRead, EmployeeUpdate
+from app.services.vectorial_services.embeding_creator import string_a_embedding
 
 router = APIRouter(prefix="/employees", tags=["employees"])
 
@@ -43,7 +45,7 @@ def get_employee(employee_id: int, db: Session = Depends(get_db)):
 
 @router.post("/", response_model=EmployeeRead)
 def create_employee(employee: EmployeeCreate, db: Session = Depends(get_db)):
-    """Create a new employee with optional profile."""
+    """Create a new employee with optional profile and embedding."""
     # Create profile if skills provided
     profile = None
     if employee.hard_skills or employee.soft_skills or employee.languages:
@@ -64,6 +66,19 @@ def create_employee(employee: EmployeeCreate, db: Session = Depends(get_db)):
         db.add(profile)
         db.flush()
 
+    # Create embedding for profile
+    try:
+        skills_text = f"{profile.hard_skills} {profile.soft_skills} {profile.languages}".strip()
+        if skills_text:
+            embedding_vector = string_a_embedding(skills_text)
+            embedding = Embedding(
+                profile_id=profile.id,
+                vector=embedding_vector
+            )
+            db.add(embedding)
+    except Exception as e:
+        print(f"[WARNING] Error creating embedding for profile {profile.id}: {e}")
+
     # Create employee with profile
     db_employee = Employee(
         name=employee.name,
@@ -82,7 +97,7 @@ def update_employee(
     employee: EmployeeUpdate,
     db: Session = Depends(get_db)
 ):
-    """Update an employee and their profile."""
+    """Update an employee and their profile with embedding."""
     db_employee = db.query(Employee).filter(Employee.id == employee_id).first()
     if not db_employee:
         raise HTTPException(status_code=404, detail="Employee not found")
@@ -103,6 +118,26 @@ def update_employee(
                 profile.soft_skills = employee.soft_skills
             if employee.languages is not None:
                 profile.languages = employee.languages
+            
+            # Update embedding if skills changed
+            try:
+                skills_text = f"{profile.hard_skills} {profile.soft_skills} {profile.languages}".strip()
+                if skills_text:
+                    embedding_vector = string_a_embedding(skills_text)
+                    
+                    # Delete old embedding if exists
+                    old_embedding = db.query(Embedding).filter(Embedding.profile_id == profile.id).first()
+                    if old_embedding:
+                        db.delete(old_embedding)
+                    
+                    # Create new embedding
+                    embedding = Embedding(
+                        profile_id=profile.id,
+                        vector=embedding_vector
+                    )
+                    db.add(embedding)
+            except Exception as e:
+                print(f"[WARNING] Error updating embedding for profile {profile.id}: {e}")
     else:
         # Create profile if it doesn't exist
         if employee.hard_skills or employee.soft_skills or employee.languages:
@@ -114,6 +149,19 @@ def update_employee(
             db.add(profile)
             db.flush()
             db_employee.profile_id = profile.id
+            
+            # Create embedding for new profile
+            try:
+                skills_text = f"{profile.hard_skills} {profile.soft_skills} {profile.languages}".strip()
+                if skills_text:
+                    embedding_vector = string_a_embedding(skills_text)
+                    embedding = Embedding(
+                        profile_id=profile.id,
+                        vector=embedding_vector
+                    )
+                    db.add(embedding)
+            except Exception as e:
+                print(f"[WARNING] Error creating embedding for new profile: {e}")
 
     db.commit()
     db.refresh(db_employee)

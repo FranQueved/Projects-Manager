@@ -348,11 +348,18 @@ export const Projects = () => {
   const handleDelete = async (id) => {
     if (window.confirm('¿Está seguro que desea eliminar este proyecto?')) {
       try {
-        await deleteProject(id);
+        console.log('Eliminando proyecto ID:', id);
+        const result = await deleteProject(id);
+        console.log('Resultado deleteProject:', result);
+        console.log('Proyecto eliminado, recargando lista...');
+        await loadProjects();
+        console.log('Lista recargada');
         setAlertMessage('Proyecto eliminado exitosamente');
         setTimeout(() => setAlertMessage(''), 3000);
       } catch (err) {
-        console.error(err);
+        console.error('Error al eliminar proyecto:', err);
+        console.error('Detalles:', err.response?.data || err.message);
+        setAlertMessage(`Error: ${err.response?.data?.detail || err.message || 'Error desconocido'}`);
       }
     }
   };
@@ -593,6 +600,7 @@ export const Projects = () => {
                                   <div className="employee-skills">
                                     {emp.hard_skills && <p><small><strong>Hard:</strong> {emp.hard_skills}</small></p>}
                                     {emp.soft_skills && <p><small><strong>Soft:</strong> {emp.soft_skills}</small></p>}
+                                    {emp.languages && <p><small><strong>Idiomas:</strong> {emp.languages}</small></p>}
                                   </div>
                                   <div style={{ marginTop: '8px' }}>
                                     {isAssigned ? (
@@ -655,6 +663,9 @@ export const Projects = () => {
                   >
                     <div>
                       <strong>{emp.name}</strong> {emp.office && <span style={{ color: '#666' }}>({emp.office})</span>}
+                      {emp.hard_skills && <div style={{ fontSize: '12px', color: '#666' }}><strong>Hard:</strong> {emp.hard_skills}</div>}
+                      {emp.soft_skills && <div style={{ fontSize: '12px', color: '#666' }}><strong>Soft:</strong> {emp.soft_skills}</div>}
+                      {emp.languages && <div style={{ fontSize: '12px', color: '#666' }}><strong>Idiomas:</strong> {emp.languages}</div>}
                     </div>
                     <button
                       type="button"

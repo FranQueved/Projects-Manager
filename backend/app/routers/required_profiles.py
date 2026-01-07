@@ -6,8 +6,10 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.db.database import get_db
 from app.models.required_profile import RequiredProfile
+from app.models.embedding import Embedding
 from app.models.project import Project
 from pydantic import BaseModel
+from app.services.vectorial_services.embeding_creator import string_a_embedding
 
 router = APIRouter(prefix="/required-profiles", tags=["required_profiles"])
 
@@ -64,7 +66,7 @@ def get_project_required_profiles(project_id: int, db: Session = Depends(get_db)
 
 @router.post("")
 def create_required_profile(data: RequiredProfileCreate, db: Session = Depends(get_db)):
-    """Create a new required profile for a project."""
+    """Create a new required profile for a project with embedding."""
     project = db.query(Project).filter(Project.id == data.project_id).first()
     if not project:
         raise HTTPException(status_code=404, detail="Project not found")
@@ -78,6 +80,19 @@ def create_required_profile(data: RequiredProfileCreate, db: Session = Depends(g
     
     db.add(required_profile)
     db.flush()
+    
+    # Create embedding for required profile
+    try:
+        skills_text = f"{data.hard_skills} {data.soft_skills} {data.languages}".strip()
+        if skills_text:
+            embedding_vector = string_a_embedding(skills_text)
+            embedding = Embedding(
+                required_profile_id=required_profile.id,
+                vector=embedding_vector
+            )
+            db.add(embedding)
+    except Exception as e:
+        print(f"[WARNING] Error creating embedding for required profile: {e}")
     
     # Get the ID before commit
     required_profile_id = required_profile.id
@@ -117,7 +132,7 @@ def update_required_profile(
     data: RequiredProfileUpdate,
     db: Session = Depends(get_db)
 ):
-    """Update a required profile."""
+    """Update a required profile with embedding."""
     required_profile = db.query(RequiredProfile).filter(
         RequiredProfile.id == required_profile_id
     ).first()
@@ -128,6 +143,28 @@ def update_required_profile(
     required_profile.hard_skills = data.hard_skills
     required_profile.soft_skills = data.soft_skills
     required_profile.languages = data.languages
+    
+    # Update embedding
+    try:
+        skills_text = f"{data.hard_skills} {data.soft_skills} {data.languages}".strip()
+        if skills_text:
+            embedding_vector = string_a_embedding(skills_text)
+            
+            # Delete old embedding if exists
+            old_embedding = db.query(Embedding).filter(
+                Embedding.required_profile_id == required_profile_id
+            ).first()
+            if old_embedding:
+                db.delete(old_embedding)
+            
+            # Create new embedding
+            embedding = Embedding(
+                required_profile_id=required_profile_id,
+                vector=embedding_vector
+            )
+            db.add(embedding)
+    except Exception as e:
+        print(f"[WARNING] Error updating embedding for required profile: {e}")
     
     db.commit()
     

@@ -17,6 +17,7 @@ export const Employees = () => {
     loading,
     error,
     loadEmployees,
+    loadProjects,
     createEmployee,
     updateEmployee,
     deleteEmployee,
@@ -115,6 +116,7 @@ export const Employees = () => {
         await createEmployee(formData);
         setAlertMessage('Empleado creado exitosamente');
       }
+      await Promise.all([loadEmployees(), loadProjects()]);
       handleClose();
       setTimeout(() => setAlertMessage(''), 3000);
     } catch (err) {
@@ -126,6 +128,7 @@ export const Employees = () => {
     if (window.confirm('¿Está seguro que desea eliminar este empleado?')) {
       try {
         await deleteEmployee(id);
+        await Promise.all([loadEmployees(), loadProjects()]);
         setAlertMessage('Empleado eliminado exitosamente');
         setTimeout(() => setAlertMessage(''), 3000);
       } catch (err) {
@@ -140,6 +143,9 @@ export const Employees = () => {
     { key: 'id', label: 'ID' },
     { key: 'name', label: 'Nombre' },
     { key: 'office', label: 'Oficina' },
+    { key: 'hard_skills', label: 'Hard Skills', render: (value) => value || '-' },
+    { key: 'soft_skills', label: 'Soft Skills', render: (value) => value || '-' },
+    { key: 'languages', label: 'Idiomas', render: (value) => value || '-' },
     {
       key: 'profile_id',
       label: 'Perfil ID',
