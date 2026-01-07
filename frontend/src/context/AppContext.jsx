@@ -1,76 +1,284 @@
-/**
- * MÓDULO CONTEXT/APPCONTEXT.JSX - CONTEXTO GLOBAL DE LA APLICACIÓN
- * ==================================================================
- * 
- * Este módulo implementa React Context para compartir estado GLOBALMENTE sin prop drilling.
- * 
- * ¿QUÉ ES EL CONTEXTO?
- * Es un mecanismo de React que permite compartir datos entre componentes sin pasar props.
- * Imagina que tienes un componente muy anidado (App → Layout → Sidebar → MenuItem).
- * Con contexto no necesitas pasar props a través de todos esos niveles.
- * 
- * ESTRUCTURA DE ESTE ARCHIVO:
- * 1. createContext(): Crea el objeto contexto
- * 2. AppProvider: Componente que envuelve la app y proporciona el estado global
- * 3. useAppContext: Hook personalizado para acceder al contexto desde cualquier componente
- * 
- * ESTADO GLOBAL DISPONIBLE:
- * - user: Información del usuario autenticado
- * - loading: Indicador si algo se está cargando
- * - error: Mensaje de error si ocurre algo
- * 
- * CÓMO USARLO:
- * 1. En App.jsx envuelve todo con: <AppProvider><App/></AppProvider>
- * 2. En cualquier componente usa: const { user, loading } = useAppContext();
- */
+import React, { createContext, useContext, useState, useCallback } from 'react';
+import { employeeService, projectService, assignmentService, recommendationService, requiredProfileService } from '../services/dataService';
 
-import React, { createContext, useContext, useState } from 'react';
-
-// Crear el contexto vacío
 const AppContext = createContext();
 
-/**
- * COMPONENT: AppProvider
- * ======================
- * Este componente envuelve la aplicación y proporciona el estado global.
- * Todos los componentes dentro pueden acceder a los valores del contexto.
- */
-export function AppProvider({ children }) {
-  // Estado global de la aplicación
-  const [user, setUser] = useState(null);           // Usuario autenticado
-  const [loading, setLoading] = useState(false);    // Indicador de carga
-  const [error, setError] = useState(null);         // Mensaje de error
+export const AppProvider = ({ children }) => {
+  const [employees, setEmployees] = useState([]);
+  const [projects, setProjects] = useState([]);
+  const [recommendations, setRecommendations] = useState([]);
+  const [requiredProfiles, setRequiredProfiles] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  // Objeto con todos los valores que queremos compartir globalmente
+  // Cargar todos los empleados
+  const loadEmployees = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await employeeService.getAll();
+      setEmployees(response.data);
+      setError(null);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Cargar todos los proyectos
+  const loadProjects = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await projectService.getAll();
+      setProjects(response.data);
+      setError(null);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Crear empleado
+  const createEmployee = useCallback(async (data) => {
+    try {
+      setLoading(true);
+      const response = await employeeService.create(data);
+      setEmployees([...employees, response.data]);
+      setError(null);
+      return response.data;
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, [employees]);
+
+  // Actualizar empleado
+  const updateEmployee = useCallback(async (id, data) => {
+    try {
+      setLoading(true);
+      const response = await employeeService.update(id, data);
+      setEmployees(employees.map(emp => emp.id === id ? response.data : emp));
+      setError(null);
+      return response.data;
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, [employees]);
+
+  // Eliminar empleado
+  const deleteEmployee = useCallback(async (id) => {
+    try {
+      setLoading(true);
+      await employeeService.delete(id);
+      setEmployees(employees.filter(emp => emp.id !== id));
+      setError(null);
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, [employees]);
+
+  // Crear proyecto
+  const createProject = useCallback(async (data) => {
+    try {
+      setLoading(true);
+      const response = await projectService.create(data);
+      setProjects([...projects, response.data]);
+      setError(null);
+      return response.data;
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, [projects]);
+
+  // Actualizar proyecto
+  const updateProject = useCallback(async (id, data) => {
+    try {
+      setLoading(true);
+      const response = await projectService.update(id, data);
+      setProjects(projects.map(proj => proj.id === id ? response.data : proj));
+      setError(null);
+      return response.data;
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, [projects]);
+
+  // Eliminar proyecto
+  const deleteProject = useCallback(async (id) => {
+    try {
+      setLoading(true);
+      await projectService.delete(id);
+      setProjects(projects.filter(proj => proj.id !== id));
+      setError(null);
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, [projects]);
+
+  // Asignar empleado a proyecto
+  const assignEmployeeToProject = useCallback(async (employeeId, projectId) => {
+    try {
+      setLoading(true);
+      await assignmentService.assignEmployee(employeeId, projectId);
+      await loadProjects();
+      setError(null);
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, [loadProjects]);
+
+  // Desasignar empleado de proyecto
+  const unassignEmployeeFromProject = useCallback(async (employeeId, projectId) => {
+    try {
+      setLoading(true);
+      await assignmentService.unassignEmployee(employeeId, projectId);
+      await loadProjects();
+      setError(null);
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, [loadProjects]);
+
+  // Obtener recomendaciones de empleados para un proyecto
+  const getRecommendations = useCallback(async (projectId) => {
+    try {
+      setLoading(true);
+      const response = await recommendationService.getEmployeeRecommendations(projectId);
+      setRecommendations(response.data);
+      setError(null);
+      return response.data;
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Cargar required profiles de un proyecto
+  const loadRequiredProfiles = useCallback(async (projectId) => {
+    try {
+      setLoading(true);
+      const response = await requiredProfileService.getProjectProfiles(projectId);
+      setRequiredProfiles(response.data);
+      setError(null);
+      return response.data;
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Crear required profile
+  const createRequiredProfile = useCallback(async (data) => {
+    try {
+      setLoading(true);
+      const response = await requiredProfileService.create(data);
+      setRequiredProfiles([...requiredProfiles, response.data]);
+      setError(null);
+      return response.data;
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, [requiredProfiles]);
+
+  // Actualizar required profile
+  const updateRequiredProfile = useCallback(async (id, data) => {
+    try {
+      setLoading(true);
+      const response = await requiredProfileService.update(id, data);
+      setRequiredProfiles(requiredProfiles.map(rp => rp.id === id ? response.data : rp));
+      setError(null);
+      return response.data;
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, [requiredProfiles]);
+
+  // Eliminar required profile
+  const deleteRequiredProfile = useCallback(async (id) => {
+    try {
+      setLoading(true);
+      await requiredProfileService.delete(id);
+      setRequiredProfiles(requiredProfiles.filter(rp => rp.id !== id));
+      setError(null);
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, [requiredProfiles]);
+
   const value = {
-    user,
-    setUser,
+    // Estado
+    employees,
+    projects,
+    recommendations,
+    requiredProfiles,
     loading,
-    setLoading,
     error,
-    setError,
+    // Acciones de empleados
+    loadEmployees,
+    createEmployee,
+    updateEmployee,
+    deleteEmployee,
+    // Acciones de proyectos
+    loadProjects,
+    createProject,
+    updateProject,
+    deleteProject,
+    // Acciones de asignaciones
+    assignEmployeeToProject,
+    unassignEmployeeFromProject,
+    // Acciones de recomendaciones
+    getRecommendations,
+    // Acciones de required profiles
+    loadRequiredProfiles,
+    createRequiredProfile,
+    updateRequiredProfile,
+    deleteRequiredProfile,
   };
 
-  return (
-    <AppContext.Provider value={value}>
-      {children}
-    </AppContext.Provider>
-  );
-}
+  return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
+};
 
-/**
- * HOOK: useAppContext
- * ====================
- * Hook personalizado para acceder al contexto desde cualquier componente.
- * Automáticamente verifica que se use dentro de AppProvider.
- * 
- * USO:
- * const { user, loading, error } = useAppContext();
- */
-export function useAppContext() {
+export const useAppContext = () => {
   const context = useContext(AppContext);
   if (!context) {
-    throw new Error('useAppContext debe ser usado dentro de AppProvider');
+    throw new Error('useAppContext debe usarse dentro de AppProvider');
   }
   return context;
-}
+};

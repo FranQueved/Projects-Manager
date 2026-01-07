@@ -2,6 +2,7 @@
 
 from pydantic import BaseModel
 from datetime import date
+from typing import Optional, List
 
 
 class ProjectBase(BaseModel):
@@ -21,9 +22,20 @@ class ProjectCreate(ProjectBase):
     pass
 
 
+class EmployeeInProject(BaseModel):
+    """Schema for employee in project."""
+    id: int
+    name: str
+    office: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
+
 class ProjectRead(ProjectBase):
     """Schema for reading project."""
     id: int
+    employees: List[EmployeeInProject] = []
 
     class Config:
         from_attributes = True

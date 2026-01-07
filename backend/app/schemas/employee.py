@@ -22,6 +22,9 @@ class EmployeeRead(EmployeeBase):
     """Schema for reading employee."""
     id: int
     profile_id: int
+    hard_skills: Optional[str] = None
+    soft_skills: Optional[str] = None
+    languages: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -32,3 +35,6 @@ class EmployeeUpdate(BaseModel):
     name: Optional[str] = None
     office: Optional[str] = None
     profile_id: Optional[int] = None
+    hard_skills: Optional[str] = None
+    soft_skills: Optional[str] = None
+    languages: Optional[str] = None
