@@ -57,6 +57,11 @@ function AppLayout() {
             <Route path="/projects" element={<Projects />} />
           </Routes>
         </main>
+
+        <footer>
+          <img src="/logo.png" alt="Logo" />
+          <p>© 2026 Project Manager. Practica CEEP.</p>
+        </footer>
       </div>
     </Router>
   );
