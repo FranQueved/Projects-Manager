@@ -23,12 +23,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include routers
-app.include_router(employees.router)
-app.include_router(projects.router)
-app.include_router(assignments.router)
-app.include_router(recommendations.router)
-app.include_router(required_profiles.router)
+# Include routers with /api prefix
+app.include_router(employees.router, prefix="/api")
+app.include_router(projects.router, prefix="/api")
+app.include_router(assignments.router, prefix="/api")
+app.include_router(recommendations.router, prefix="/api")
+app.include_router(required_profiles.router, prefix="/api")
 
 
 @app.get("/")
