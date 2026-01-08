@@ -9,34 +9,34 @@
 # 
 
 # Framework web moderno y rápido para APIs
-fastapi==0.122.0
+fastapi>=0.122.0
 
 # Servidor ASGI para ejecutar FastAPI
-uvicorn==0.38.0
+uvicorn>=0.38.0
 
 # Validación de datos y modelos Pydantic
-pydantic==2.12.4
+pydantic>=2.12.4
 
 # Variables de entorno desde archivo .env
-python-dotenv==1.2.1
+python-dotenv>=1.2.1
 
 # ORM para bases de datos SQL
-sqlalchemy==2.0.44
+sqlalchemy>=2.0.44
 
 # Driver para conectar a PostgreSQL
-psycopg2-binary==2.9.11
+psycopg2-binary>=2.9.11
 
 # Extensión pgvector para SQLAlchemy (búsqueda vectorial en PostgreSQL)
-pgvector==0.4.2
+pgvector>=0.4.2
 
 # Embeddings basados en Sentence Transformers (modelos preentrenados)
-sentence-transformers==5.2.0
+sentence-transformers>=5.2.0
 
 # Framework de Machine Learning (requerido por sentence-transformers)
-torch==2.9.1
+torch>=2.9.1
 
 # Tokenizador para modelos de NLP
-transformers==4.57.3
+transformers>=4.57.3
 
 # NumPy para cálculos numéricos
 numpy>=1.26.0
