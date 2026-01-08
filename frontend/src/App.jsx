@@ -19,29 +19,58 @@
  */
 
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { AppProvider } from './context/AppContext';
+import { Home } from './pages/Home';
+import { Dashboard } from './pages/Dashboard';
+import { Employees } from './pages/Employees';
+import { Projects } from './pages/Projects';
 import './App.css';
 
-// Importar páginas
-// import Home from './pages/Home';
-// import Dashboard from './pages/Dashboard';
-
-function App() {
+function AppLayout() {
   return (
     <Router>
       <div className="App">
-        <header className="App-header">
-          <h1>Mi Proyecto</h1>
-        </header>
-        <main>
+        <nav className="navbar">
+          <div className="nav-container">
+            <Link to="/" className="nav-brand">
+              Project Manager
+            </Link>
+            <ul className="nav-menu">
+              <li>
+                <Link to="/dashboard">Dashboard</Link>
+              </li>
+              <li>
+                <Link to="/employees">Empleados</Link>
+              </li>
+              <li>
+                <Link to="/projects">Proyectos</Link>
+              </li>
+            </ul>
+          </div>
+        </nav>
+        <main className="main-content">
           <Routes>
-            {/* <Route path="/" element={<Home />} />
-            <Route path="/dashboard" element={<Dashboard />} /> */}
+            <Route path="/" element={<Home />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/employees" element={<Employees />} />
+            <Route path="/projects" element={<Projects />} />
           </Routes>
         </main>
+
+        <footer>
+          <img src="/logo.png" alt="Logo" />
+          <p>© 2026 Project Manager. Practica CEEP.</p>
+        </footer>
       </div>
     </Router>
   );
 }
 
-export default App;
+export default function App() {
+  return (
+    <AppProvider>
+      <AppLayout />
+    </AppProvider>
+  );
+}

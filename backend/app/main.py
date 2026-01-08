@@ -4,6 +4,7 @@ Project Manager API - Backend FastAPI Application
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from app.routers import employees, projects, assignments, recommendations, required_profiles
 
 app = FastAPI(
     title="Project Manager API",
@@ -21,6 +22,13 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Include routers
+app.include_router(employees.router)
+app.include_router(projects.router)
+app.include_router(assignments.router)
+app.include_router(recommendations.router)
+app.include_router(required_profiles.router)
 
 
 @app.get("/")
