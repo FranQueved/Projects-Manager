@@ -56,48 +56,7 @@ class EmployeeService:
         
         return employee
 
-    def create_many(self, data_list: List[dict]) -> List[Employee]:
-        """Create multiple employees with auto profile creation and embedding generation."""
-        created = []
-        for data in data_list:
-            schema = EmployeeCreate(**data)
-            
-            # If profile_id is provided, use existing profile
-            if schema.profile_id:
-                profile = self.db.query(Profile).filter(Profile.id == schema.profile_id).first()
-                if not profile:
-                    raise ValueError(f"Profile {schema.profile_id} does not exist")
-                
-                existing = self.db.query(Employee).filter(Employee.profile_id == schema.profile_id).first()
-                if existing:
-                    raise ValueError(f"Profile {schema.profile_id} already assigned to employee {existing.id}")
-            # Otherwise, create new profile from provided data
-            elif schema.hard_skills or schema.soft_skills or schema.languages:
-                profile = Profile(
-                    hard_skills=schema.hard_skills or "",
-                    soft_skills=schema.soft_skills or "",
-                    languages=schema.languages or ""
-                )
-                self.db.add(profile)
-                self.db.flush()
-            else:
-                raise ValueError("Either profile_id or profile data (hard_skills, soft_skills, languages) must be provided")
-            
-            # Create employee with profile
-            employee_data = {
-                "name": schema.name,
-                "office": schema.office,
-                "profile_id": profile.id
-            }
-            employee = Employee(**employee_data)
-            self.db.add(employee)
-            created.append(employee)
-        
-        self.db.commit()
-        for employee in created:
-            self.db.refresh(employee)
-            self.embedding_service.create_embedding_for_employee(employee.id)
-        return created
+
 
     def get_by_id(self, employee_id: int) -> Optional[Employee]:
         """Get employee by ID."""
