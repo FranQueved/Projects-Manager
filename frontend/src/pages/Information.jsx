@@ -26,19 +26,19 @@ export const Information = () => {
         <h2>Características Principales</h2>
         <div className="features-grid">
           <Card>
-            <h3>📊 Dashboard</h3>
+            <h3>Dashboard</h3>
             <p>Visualiza un resumen completo de tus proyectos y el desempeño del equipo en tiempo real.</p>
           </Card>
           <Card>
-            <h3>👥 Gestión de Empleados</h3>
+            <h3>Gestión de Empleados</h3>
             <p>Administra tu equipo, consulta perfiles y competencias de cada miembro.</p>
           </Card>
           <Card>
-            <h3>📁 Proyectos</h3>
+            <h3>Proyectos</h3>
             <p>Crea, edita y supervisa todos tus proyectos desde un solo lugar.</p>
           </Card>
           <Card>
-            <h3>🎯 Asignaciones</h3>
+            <h3>Asignaciones</h3>
             <p>Asigna empleados a proyectos de manera inteligente según sus competencias.</p>
           </Card>
         </div>
@@ -71,14 +71,6 @@ export const Information = () => {
         </div>
       </section>
 
-      <section className="info-section">
-        <h2>Recomendaciones</h2>
-        <p>
-          Utiliza la sección de recomendaciones para obtener sugerencias automáticas 
-          sobre qué empleados se adaptan mejor a cada proyecto basándose en sus 
-          competencias y experiencia.
-        </p>
-      </section>
 
       <section className="info-section info-footer">
         <h2>¿Necesitas ayuda?</h2>
