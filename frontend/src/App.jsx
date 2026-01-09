@@ -26,7 +26,7 @@ import { Dashboard } from './pages/Dashboard';
 import { Employees } from './pages/Employees';
 import { Projects } from './pages/Projects';
 import { Information } from './pages/Information';
-import { About } from './pages/About';
+import { About } from './pages/about';
 import './App.css';
 
 function AppLayout() {
