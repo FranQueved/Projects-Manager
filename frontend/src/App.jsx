@@ -18,16 +18,20 @@
  * En resumen: App.jsx es el orquestador principal de la navegación y estructura visual.
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { AppProvider } from './context/AppContext';
 import { Home } from './pages/Home';
 import { Dashboard } from './pages/Dashboard';
 import { Employees } from './pages/Employees';
 import { Projects } from './pages/Projects';
+import { Information } from './pages/Information';
+import { About } from './pages/About';
 import './App.css';
 
 function AppLayout() {
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
   return (
     <Router>
       <div className="App">
@@ -46,6 +50,30 @@ function AppLayout() {
               <li>
                 <Link to="/projects">Proyectos</Link>
               </li>
+              <li className="dropdown-menu">
+                <button 
+                  className="dropdown-btn"
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                >
+                  Más ▼
+                </button>
+                {isDropdownOpen && (
+                  <div className="dropdown-content">
+                    <Link 
+                      to="/information"
+                      onClick={() => setIsDropdownOpen(false)}
+                    >
+                      Información
+                    </Link>
+                    <Link 
+                      to="/about"
+                      onClick={() => setIsDropdownOpen(false)}
+                    >
+                      Funcionamiento
+                    </Link>
+                  </div>
+                )}
+              </li>
             </ul>
           </div>
         </nav>
@@ -55,6 +83,8 @@ function AppLayout() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/employees" element={<Employees />} />
             <Route path="/projects" element={<Projects />} />
+            <Route path="/information" element={<Information />} />
+            <Route path="/about" element={<About />} />
           </Routes>
         </main>
 
