@@ -1,12 +1,4 @@
-# ============================================
-# DEPENDENCIAS DEL BACKEND - PYTHON
-# ============================================
-# 
-# Este archivo lista todas las librerías Python
-# necesarias para ejecutar el backend.
-# 
-# Para instalar: pip install -r requirements.txt
-# 
+
 
 # Framework web moderno y rápido para APIs
 fastapi>=0.122.0
